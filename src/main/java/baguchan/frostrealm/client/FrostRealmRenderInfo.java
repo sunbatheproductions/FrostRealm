@@ -4,6 +4,7 @@ import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.capability.FrostWeatherManager;
 import baguchan.frostrealm.client.sounds.FrostAmbientSoundsHandler;
 import baguchan.frostrealm.registry.FrostParticleTypes;
+import baguchan.frostrealm.registry.FrostWeathers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -94,13 +95,14 @@ public class FrostRealmRenderInfo extends DimensionSpecialEffects {
     @Override
     public boolean renderSnowAndRain(ClientLevel level, int ticks, float partialTick, LightTexture lightTexture, double camX, double camY, double camZ) {
         float f = FrostWeatherManager.getWeatherLevel(partialTick);
-        if (!(f <= 0.0F)) {
+        if (!(f <= 0.0F) && FrostWeatherManager.getFrostWeather() == FrostWeathers.BLIZZARD.get()) {
             for (int i = 0; i < 2; i++) {
-                float x = level.getRandom().nextFloat() * 0.5F - level.getRandom().nextFloat();
-                float y = level.getRandom().nextFloat();
-                float z = level.getRandom().nextFloat() * 0.5F - level.getRandom().nextFloat();
-                level.addParticle(FrostParticleTypes.SNOW.get(), camX - x * 36F, camY + 8 + y * 16, camZ - z * 36, -0.2F, -0.5F, -0.2F);
-
+                if (level.random.nextInt(2) != 0) {
+                    float x = level.getRandom().nextFloat() * 0.5F - level.getRandom().nextFloat();
+                    float y = level.getRandom().nextFloat();
+                    float z = level.getRandom().nextFloat() * 0.5F - level.getRandom().nextFloat();
+                    level.addParticle(FrostParticleTypes.SNOW.get(), camX - x * 36F, camY + 8 + y * 16, camZ - z * 36, -0.2F, -0.5F, -0.2F);
+                }
             }
         }
         return false;

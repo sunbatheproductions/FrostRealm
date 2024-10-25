@@ -191,7 +191,6 @@ public class CommonEvents {
                     serverLevel.getProfiler().popPush("freeze_weather");
                 }
                 serverLevel.getProfiler().push("freeze");
-                if (event.getLevel().random.nextInt(8) == 0) {
                     chunkManager.getChunks().forEach(chunkHolder -> {
                         ChunkResult<LevelChunk> optionalChunk = chunkHolder.getEntityTickingChunkFuture().getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK);
                         if (optionalChunk.isSuccess()) {
@@ -231,7 +230,6 @@ public class CommonEvents {
                             });
                         }
                     });
-                }
                 serverLevel.getProfiler().popPush("freeze");
             }
         }

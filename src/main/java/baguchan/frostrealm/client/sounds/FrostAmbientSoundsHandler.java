@@ -36,39 +36,47 @@ public class FrostAmbientSoundsHandler implements AmbientSoundHandler {
         FrostWeather frostWeather = FrostWeatherManager.getFrostWeather();
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().level != null) {
             BlockPos blockpos = Minecraft.getInstance().player.blockPosition();
-            BlockPos blockpos1 = null;
-            BlockPos blockpos2 = Minecraft.getInstance().level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos);
-            if (blockpos2.getY() > Minecraft.getInstance().level.getMinBuildHeight() && blockpos2.getY() <= blockpos.getY() + 10 && blockpos2.getY() >= blockpos.getY() - 10) {
-                blockpos1 = blockpos2.below();
-            }
-            if (blockpos1 != null) {
-                if (blockpos1.getY() > blockpos.getY() + 1 && Minecraft.getInstance().level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos).getY() > Mth.floor((float) blockpos.getY())) {
-                    this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::toneDown);
-                } else {
-                    this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::toneUp);
-                }
-            }
-        }
-        BlockPos blockpos = Minecraft.getInstance().player.blockPosition();
-        if (frostWeather.getNonAffectableBiome().isPresent() && Minecraft.getInstance().level.getBiome(blockpos).is(frostWeather.getNonAffectableBiome().get())) {
-            this.previousWeather = frostWeather;
-            this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::fadeOut);
-        } else {
-            if (frostWeather != this.previousWeather || this.loopSounds.values().isEmpty()) {
-                this.previousWeather = frostWeather;
+
+
+            if (frostWeather.getNonAffectableBiome().isPresent() && Minecraft.getInstance().level.getBiome(blockpos).is(frostWeather.getNonAffectableBiome().get())) {
                 this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::fadeOut);
-                frostWeather.getSoundEvents().ifPresent(soundEvent -> {
-                    this.loopSounds.compute(frostWeather, (p_174924_, p_174925_) -> {
-                        if (p_174925_ == null) {
-                            p_174925_ = new FrostAmbientSoundsHandler.LoopSoundInstance((SoundEvent) soundEvent);
-                            this.soundManager.play(p_174925_);
+            } else {
+                if (frostWeather != this.previousWeather) {
+                    this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::fadeOut);
+                    if (this.loopSounds.values().isEmpty()) {
+                        frostWeather.getSoundEvents().ifPresent(soundEvent -> {
+                            this.loopSounds.compute(frostWeather, (p_174924_, p_174925_) -> {
+                                if (p_174925_ == null) {
+                                    p_174925_ = new FrostAmbientSoundsHandler.LoopSoundInstance((SoundEvent) soundEvent);
+                                    this.soundManager.play(p_174925_);
+                                }
+
+                                p_174925_.fadeIn();
+                                return p_174925_;
+                            });
+                        });
+                        this.previousWeather = frostWeather;
+                    }
+
+                } else {
+                    BlockPos blockpos2 = Minecraft.getInstance().level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos);
+                    BlockPos blockpos1 = blockpos2.below();
+
+                    if (blockpos1.getY() > blockpos.getY() + 1 && Minecraft.getInstance().level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos).getY() > Mth.floor((float) blockpos.getY()) + 10) {
+
+                        this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::fadeOut);
+                    } else {
+                        if (blockpos1.getY() > blockpos.getY() + 1 && Minecraft.getInstance().level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockpos).getY() > Mth.floor((float) blockpos.getY())) {
+
+                            this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::toneDown);
+                        } else {
+                            this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::toneUp);
                         }
+                        this.loopSounds.values().forEach(FrostAmbientSoundsHandler.LoopSoundInstance::fadeIn);
 
-                        p_174925_.fadeIn();
-                        return p_174925_;
-                    });
-                });
+                    }
 
+                }
             }
         }
     }
@@ -97,28 +105,28 @@ public class FrostAmbientSoundsHandler implements AmbientSoundHandler {
             }
 
             this.fade += this.fadeDirection;
-            this.tone += this.toneDirection;
-            this.volume = Mth.clamp((float) this.fade / 100.0F, 0.0F, Mth.clamp(0.5F + tone, 0F, 3F));
+            this.tone += this.toneDirection * 0.1F;
+            this.volume = Mth.clamp((float) this.fade / 200.0F, 0.0F, Mth.clamp(0.85F + tone, 0F, 3F));
         }
 
 
         public void fadeOut() {
-            this.fade = Math.min(this.fade, 100);
+            this.fade = Math.clamp(this.fade, 0, 200);
             this.fadeDirection = -1;
         }
 
         public void toneDown() {
-            this.tone = Math.min(this.fade, 2.5F);
+            this.tone = Math.clamp(this.tone, 0F, 3F);
             this.toneDirection = -1;
         }
 
         public void toneUp() {
-            this.tone = Math.max(0, this.tone);
+            this.tone = Math.clamp(this.tone, 0F, 3F);
             this.toneDirection = 1;
         }
 
         public void fadeIn() {
-            this.fade = Math.max(0, this.fade);
+            this.fade = Math.clamp(this.fade, 0, 200);
             this.fadeDirection = 1;
         }
     }
