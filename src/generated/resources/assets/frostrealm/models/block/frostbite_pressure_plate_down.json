@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/pressure_plate_down",
   "textures": {
-    "texture": "frostrealm:block/frostroot_planks"
+    "texture": "frostrealm:block/frostbite_planks"
   }
 }

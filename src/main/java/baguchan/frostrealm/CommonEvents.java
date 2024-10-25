@@ -208,12 +208,13 @@ public class CommonEvents {
                                             BlockPos pos = serverLevel.getBlockRandomPos(chunkPos.getMinBlockX(), k, chunkPos.getMinBlockZ(), 15);
                                             BlockPos posDown = pos.below();
 
-                                            if (!event.getLevel().getBiome(pos).is(FrostTags.Biomes.HOT_BIOME)) {
                                                 if (serverLevel.isAreaLoaded(posDown, 1)) {
                                                     BlockState snowState = serverLevel.getBlockState(pos);
                                                     BlockState snowStateBelow = serverLevel.getBlockState(pos.below());
                                                     if (snowState.getBlock() instanceof CropBlock) {
                                                         if (!snowState.is(FrostTags.Blocks.NON_FREEZE_CROP)) {
+                                                            serverLevel.playSound(null, pos, SoundEvents.PLAYER_HURT_FREEZE, SoundSource.BLOCKS);
+                                                            serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + serverLevel.random.nextFloat(), pos.getY() + serverLevel.random.nextFloat(), pos.getZ() + serverLevel.random.nextFloat(), 4, 0.0D, 0.0D, 0.0D, 0.0F);
                                                             serverLevel.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                                                         }
                                                     }
@@ -222,7 +223,6 @@ public class CommonEvents {
                                                         serverLevel.setBlockAndUpdate(pos, FrostBlocks.FROSTBITE_SAPLING.get().defaultBlockState());
                                                         serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, pos.getX() + serverLevel.random.nextFloat(), pos.getY() + serverLevel.random.nextFloat(), pos.getZ() + serverLevel.random.nextFloat(), 4, 0.0D, 0.0D, 0.0D, 0.0F);
                                                     }
-                                                }
                                             }
                                         }
                                     }
