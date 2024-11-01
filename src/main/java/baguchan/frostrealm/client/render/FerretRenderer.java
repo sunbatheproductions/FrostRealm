@@ -6,6 +6,7 @@ import baguchan.frostrealm.client.model.FerretModel;
 import baguchan.frostrealm.client.render.layer.FerretCollarLayer;
 import baguchan.frostrealm.client.render.state.FerretRenderState;
 import baguchan.frostrealm.entity.animal.Ferret;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +18,13 @@ public class FerretRenderer<T extends Ferret> extends MobRenderer<T, FerretRende
         super(p_173952_, new FerretModel<>(p_173952_.bakeLayer(FrostModelLayers.FERRET)), 0.5F);
         this.addLayer(new FerretCollarLayer<>(this));
     }
+
+    @Override
+    protected void scale(FerretRenderState p_115314_, PoseStack p_115315_) {
+        p_115315_.scale(p_115314_.ageScale, p_115314_.ageScale, p_115314_.ageScale);
+        super.scale(p_115314_, p_115315_);
+    }
+
 
     @Override
     public void extractRenderState(T p_362733_, FerretRenderState p_360515_, float p_361157_) {
