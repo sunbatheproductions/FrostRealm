@@ -48,7 +48,6 @@ public class FrostRealm {
 
 	public static final String NETWORK_PROTOCOL = "2";
 
-
 	public FrostRealm(ModContainer modContainer, IEventBus modBus) {
 
 		IEventBus forgeBus = NeoForge.EVENT_BUS;

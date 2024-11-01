@@ -134,22 +134,22 @@
         },
         {
           "type": "minecraft:item",
-          "name": "frostrealm:frost_boar_helmet",
+          "name": "frostrealm:frost_boar_fur_helmet",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "frostrealm:frost_boar_chestplate",
+          "name": "frostrealm:frost_boar_fur_chestplate",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "frostrealm:frost_boar_leggings",
+          "name": "frostrealm:frost_boar_fur_leggings",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "frostrealm:frost_boar_boots",
+          "name": "frostrealm:frost_boar_fur_boots",
           "weight": 5
         },
         {

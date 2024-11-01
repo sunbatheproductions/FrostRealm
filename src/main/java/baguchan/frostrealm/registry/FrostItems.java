@@ -14,15 +14,15 @@ import static baguchan.frostrealm.FrostRealm.MODID;
 public class FrostItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 
-    public static final DeferredHolder<Item, Item> FROST_CRYSTAL = ITEMS.registerItem("frost_crystal", (properties) -> new FrostCrystalItem(properties));
+    public static final DeferredHolder<Item, Item> FROST_CRYSTAL = ITEMS.registerItem("frost_crystal", FrostCrystalItem::new);
 
-    public static final DeferredHolder<Item, Item> CRYONITE = ITEMS.registerItem("cryonite", (properties) -> new Item(properties));
-    public static final DeferredHolder<Item, Item> CRYONITE_CREAM = ITEMS.registerItem("cryonite_cream", (properties) -> new GlimmerRockItem(properties));
+    public static final DeferredHolder<Item, Item> CRYONITE = ITEMS.registerItem("cryonite", Item::new);
+    public static final DeferredHolder<Item, Item> CRYONITE_CREAM = ITEMS.registerItem("cryonite_cream", GlimmerRockItem::new);
 
     public static final DeferredHolder<Item, Item> WARPED_CRYSTAL = ITEMS.registerItem("warped_crystal", (properties) -> new Item(properties));
     public static final DeferredHolder<Item, Item> VENOM_CRYSTAL = ITEMS.registerItem("venom_crystal", (properties) -> new Item(properties));
     public static final DeferredHolder<Item, Item> UNSTABLE_VENOM_CRYSTAL = ITEMS.registerItem("unstable_venom_crystal", (properties) -> new SmithableCrystalItem(properties));
-    public static final DeferredHolder<Item, Item> GLIMMERROCK = ITEMS.registerItem("glimmerrock", (properties) -> new GlimmerRockItem(properties));
+    public static final DeferredHolder<Item, Item> GLIMMERROCK = ITEMS.registerItem("glimmerrock", GlimmerRockItem::new);
     public static final DeferredHolder<Item, Item> ASTRIUM_RAW = ITEMS.registerItem("astrium_raw", (properties) -> new Item(properties));
     public static final DeferredHolder<Item, Item> ASTRIUM_INGOT = ITEMS.registerItem("astrium_ingot", (properties) -> new Item(properties));
     public static final DeferredHolder<Item, Item> STARDUST_CRYSTAL = ITEMS.registerItem("stardust_crystal", (properties) -> new Item(properties));
