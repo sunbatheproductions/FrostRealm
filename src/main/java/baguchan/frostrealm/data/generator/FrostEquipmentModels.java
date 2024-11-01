@@ -12,7 +12,7 @@ public interface FrostEquipmentModels {
     ResourceLocation YETI_FUR = FrostRealm.prefix("yeti_fur");
 
     static void bootstrap(BiConsumer<ResourceLocation, EquipmentModel> p_371586_) {
-        p_371586_.accept(ASTRIUM, onlyHumanoidAndWolf("astrium"));
+        p_371586_.accept(ASTRIUM, onlyHumanoid("astrium"));
         p_371586_.accept(FROST_BOAR_FUR, onlyHumanoid("frost_boar_fur"));
         p_371586_.accept(YETI_FUR, onlyHumanoid("yeti_fur"));
     }
