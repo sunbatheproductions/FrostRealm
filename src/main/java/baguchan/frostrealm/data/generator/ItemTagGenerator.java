@@ -78,6 +78,10 @@ public class ItemTagGenerator extends ItemTagsProvider {
         this.tag(FrostTags.Items.ASTRIUM_TOOL_MATERIAL).add(FrostItems.ASTRIUM_SICKLE.get()).add(FrostItems.ASTRIUM_SWORD.get()).add(FrostItems.ASTRIUM_AXE.get()).add(FrostItems.ASTRIUM_SHOVEL.get()).add(FrostItems.ASTRIUM_HOE.get()).add(FrostItems.ASTRIUM_PICKAXE.get())
                 .add(FrostItems.ASTRIUM_HELMET.get()).add(FrostItems.ASTRIUM_CHESTPLATE.get()).add(FrostItems.ASTRIUM_LEGGINGS.get()).add(FrostItems.ASTRIUM_BOOTS.get());
 
+        this.tag(FrostTags.Items.GLACINIUM_TOOL_MATERIAL).add(FrostItems.GLACINIUM_SICKLE.get()).add(FrostItems.GLACINIUM_SWORD.get()).add(FrostItems.GLACINIUM_AXE.get()).add(FrostItems.GLACINIUM_SHOVEL.get()).add(FrostItems.GLACINIUM_HOE.get()).add(FrostItems.GLACINIUM_PICKAXE.get());
+        //.add(FrostItems.GLACINIUM_HELMET.get()).add(FrostItems.GLACINIUM_CHESTPLATE.get()).add(FrostItems.GLACINIUM_LEGGINGS.get()).add(FrostItems.GLACINIUM_BOOTS.get());
+
+
         this.tag(ItemTags.MEAT).add(FrostItems.COOKED_FROST_BOAR_MEAT.get()).add(FrostItems.COOKED_SNOWPILE_QUAIL_MEAT.get())
                 .add(FrostItems.FROST_BOAR_MEAT.get()).add(FrostItems.SNOWPILE_QUAIL_MEAT.get());
     }

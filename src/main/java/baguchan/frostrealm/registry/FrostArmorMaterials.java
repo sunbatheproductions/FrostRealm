@@ -1,6 +1,6 @@
 package baguchan.frostrealm.registry;
 
-import baguchan.frostrealm.FrostRealm;
+import baguchan.frostrealm.data.generator.FrostEquipmentModels;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -28,29 +28,21 @@ public class FrostArmorMaterials {
 		p_266652_.put(ArmorType.CHESTPLATE, 6);
 		p_266652_.put(ArmorType.HELMET, 2);
 		p_266652_.put(ArmorType.BODY, 5);
-	}), 15, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F, FrostRealm.prefix("yeti_fur"));
+	}), 15, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F, FrostEquipmentModels.YETI_FUR);
 	public static final FrostArmorMaterial FROST_BOAR_FUR = new FrostArmorMaterial(15, Util.make(new EnumMap<>(ArmorType.class), (p_266652_) -> {
 		p_266652_.put(ArmorType.BOOTS, 2);
 		p_266652_.put(ArmorType.LEGGINGS, 5);
 		p_266652_.put(ArmorType.CHESTPLATE, 6);
 		p_266652_.put(ArmorType.HELMET, 2);
 		p_266652_.put(ArmorType.BODY, 5);
-	}), 15, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F, FrostRealm.prefix("boar_fur"));
+	}), 15, SoundEvents.ARMOR_EQUIP_LEATHER, 1.0F, 0.0F, FrostEquipmentModels.FROST_BOAR_FUR);
 	public static final FrostArmorMaterial ASTRIUM = new FrostArmorMaterial(16, Util.make(new EnumMap<>(ArmorType.class), (p_266654_) -> {
 		p_266654_.put(ArmorType.BOOTS, 2);
 		p_266654_.put(ArmorType.LEGGINGS, 5);
 		p_266654_.put(ArmorType.CHESTPLATE, 6);
 		p_266654_.put(ArmorType.HELMET, 2);
-		p_266654_.put(ArmorType.BODY, 5);
-	}), 12, SoundEvents.ARMOR_EQUIP_IRON, 1.5F, 0.0F, FrostRealm.prefix("astrium"));
-	public static final FrostArmorMaterial ASTRIUM_WOLF = new FrostArmorMaterial(16, Util.make(new EnumMap<>(ArmorType.class), (p_266654_) -> {
-		p_266654_.put(ArmorType.BOOTS, 2);
-		p_266654_.put(ArmorType.LEGGINGS, 5);
-		p_266654_.put(ArmorType.CHESTPLATE, 6);
-		p_266654_.put(ArmorType.HELMET, 2);
-		p_266654_.put(ArmorType.BODY, 16);
-	}), 12, SoundEvents.ARMOR_EQUIP_IRON, 1.5F, 0.0F, FrostRealm.prefix("astrium_wolf"));
-
+		p_266654_.put(ArmorType.BODY, 15);
+	}), 12, SoundEvents.ARMOR_EQUIP_IRON, 1.5F, 0.0F, FrostEquipmentModels.ASTRIUM);
 	public record FrostArmorMaterial(
 			int durability,
 			Map<ArmorType, Integer> defense,

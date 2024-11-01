@@ -84,7 +84,7 @@ public class FrostItems {
     public static final DeferredHolder<Item, Item> ASTRIUM_CHESTPLATE = ITEMS.registerItem("astrium_chestplate", (properties) -> new FrostArmorItem(FrostArmorMaterials.ASTRIUM, ArmorType.CHESTPLATE, (properties.durability(ArmorType.CHESTPLATE.getDurability(22)))));
     public static final DeferredHolder<Item, Item> ASTRIUM_LEGGINGS = ITEMS.registerItem("astrium_leggings", (properties) -> new FrostArmorItem(FrostArmorMaterials.ASTRIUM, ArmorType.LEGGINGS, (properties.durability(ArmorType.LEGGINGS.getDurability(22)))));
     public static final DeferredHolder<Item, Item> ASTRIUM_BOOTS = ITEMS.registerItem("astrium_boots", (properties) -> new FrostArmorItem(FrostArmorMaterials.ASTRIUM, ArmorType.BOOTS, (properties.durability(ArmorType.BOOTS.getDurability(22)))));
-    public static final DeferredHolder<Item, Item> WOLFFLUE_ASTRIUM_ARMOR = ITEMS.registerItem("wolfflue_astrium_armor", (properties) -> new WolfflueArmorItem(FrostArmorMaterials.ASTRIUM_WOLF, (properties.durability(ArmorType.BODY.getDurability(22)))));
+    public static final DeferredHolder<Item, Item> WOLFFLUE_ASTRIUM_ARMOR = ITEMS.registerItem("wolfflue_astrium_armor", (properties) -> new WolfflueArmorItem(FrostArmorMaterials.ASTRIUM, (properties.durability(ArmorType.BODY.getDurability(22)))));
 
 
     public static final DeferredHolder<Item, Item> MARMOT_SPAWNEGG = ITEMS.registerItem("marmot_spawn_egg", (properties) -> new DeferredSpawnEggItem(FrostEntities.MARMOT, 0xB18346, 0x9B6B2D, properties));

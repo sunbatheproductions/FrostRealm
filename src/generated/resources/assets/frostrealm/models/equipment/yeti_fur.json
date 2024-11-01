@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "frostrealm:yeti_fur"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "frostrealm:yeti_fur"
+      }
+    ]
+  }
+}

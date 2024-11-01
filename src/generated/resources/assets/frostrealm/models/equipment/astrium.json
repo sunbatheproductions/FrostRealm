@@ -1,0 +1,19 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "frostrealm:astrium"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "frostrealm:astrium"
+      }
+    ],
+    "wolf_body": [
+      {
+        "texture": "frostrealm:astrium"
+      }
+    ]
+  }
+}
