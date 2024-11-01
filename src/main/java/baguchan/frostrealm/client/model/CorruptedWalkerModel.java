@@ -3,13 +3,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.10.4
 // Paste this class into your mod and generate all required imports
 
 
-import baguchan.frostrealm.entity.hostile.part.CorruptedWalker;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.CorruptedWalkerRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class CorruptedWalkerModel<T extends CorruptedWalker> extends HierarchicalModel<T> {
+public class CorruptedWalkerModel<T extends CorruptedWalkerRenderState> extends EntityModel<T> {
     private final ModelPart realroot;
 
     private final ModelPart root;
@@ -22,6 +22,7 @@ public class CorruptedWalkerModel<T extends CorruptedWalker> extends Hierarchica
     private final ModelPart head;
 
     public CorruptedWalkerModel(ModelPart root) {
+        super(root);
         this.realroot = root;
         this.root = root.getChild("root");
         this.body = this.root.getChild("body");
@@ -57,12 +58,10 @@ public class CorruptedWalkerModel<T extends CorruptedWalker> extends Hierarchica
     }
 
     @Override
-    public void setupAnim(CorruptedWalker entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        //this.head.xRot = headPitch * (float) (Math.PI / 180.0);
-        this.head.yRot = netHeadYaw * (float) (Math.PI / 180.0);
+    public void setupAnim(T state) {
+        super.setupAnim(state);
+        //this.head.xRot = entity.yRot * (float) (Math.PI / 180.0);
+        this.head.yRot = state.xRot * (float) (Math.PI / 180.0);
     }
 
-    public ModelPart root() {
-        return realroot;
-    }
 }

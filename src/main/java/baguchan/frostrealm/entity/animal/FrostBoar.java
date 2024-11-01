@@ -1,17 +1,19 @@
 package baguchan.frostrealm.entity.animal;
 
-import bagu_chan.bagus_lib.register.ModSensors;
 import baguchan.frostrealm.entity.brain.FrostBoarAi;
 import baguchan.frostrealm.registry.FrostEntities;
 import baguchan.frostrealm.registry.FrostMemoryModuleType;
 import baguchan.frostrealm.registry.FrostSensors;
 import baguchan.frostrealm.registry.FrostTags;
+import baguchi.bagus_lib.register.ModSensors;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
@@ -22,7 +24,6 @@ import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.monster.hoglin.HoglinBase;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -31,8 +32,6 @@ import org.jetbrains.annotations.Nullable;
 public class FrostBoar extends FrostAnimal {
     private static final EntityDimensions BABY_DIMENSIONS = FrostEntities.FROST_BOAR.get().getDimensions().scale(0.5F).withEyeHeight(0.75F);
 
-
-    private static final Ingredient FOOD_ITEMS = Ingredient.of(FrostTags.Items.FROST_BOAR_FOODS);
     protected static final ImmutableList<? extends SensorType<? extends Sensor<? super FrostBoar>>> SENSOR_TYPES = ImmutableList.of(ModSensors.SMART_NEAREST_LIVING_ENTITY_SENSOR.get(), SensorType.NEAREST_ADULT, SensorType.HURT_BY
             , FrostSensors.FROST_BOAR_SENSOR.get(), FrostSensors.ENEMY_SENSOR.get());
     protected static final ImmutableList<? extends MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(MemoryModuleType.BREED_TARGET, MemoryModuleType.NEAREST_LIVING_ENTITIES, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, MemoryModuleType.LOOK_TARGET, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.PATH, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.NEAREST_VISIBLE_ADULT, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.ANGRY_AT, MemoryModuleType.NEAREST_ATTACKABLE, MemoryModuleType.TEMPTING_PLAYER, MemoryModuleType.TEMPTATION_COOLDOWN_TICKS, MemoryModuleType.IS_TEMPTED, MemoryModuleType.HAS_HUNTING_COOLDOWN, MemoryModuleType.IS_PANICKING
@@ -53,17 +52,18 @@ public class FrostBoar extends FrostAnimal {
 
     @Override
     public boolean isFood(ItemStack p_248671_) {
-        return FOOD_ITEMS.test(p_248671_);
+        return p_248671_.is(FrostTags.Items.FROST_BOAR_FOODS);
     }
 
     @Override
-    protected void customServerAiStep() {
-        this.level().getProfiler().push("boarBrain");
-        this.getBrain().tick((ServerLevel) this.level(), this);
-        this.level().getProfiler().pop();
-        this.level().getProfiler().push("boarActivityUpdate");
+    protected void customServerAiStep(ServerLevel serverLevel) {
+        ProfilerFiller profiler = Profiler.get();
+        profiler.push("boarBrain");
+        this.getBrain().tick(serverLevel, this);
+        profiler.pop();
+        profiler.push("boarActivityUpdate");
         FrostBoarAi.updateActivity(this);
-        this.level().getProfiler().pop();
+        profiler.pop();
     }
 
     protected Brain.Provider<FrostBoar> brainProvider() {
@@ -144,14 +144,14 @@ public class FrostBoar extends FrostAnimal {
         return this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D;
     }
 
-    public boolean doHurtTarget(Entity p_34491_) {
+    public boolean doHurtTarget(ServerLevel serverLevel, Entity p_34491_) {
         if (!(p_34491_ instanceof LivingEntity)) {
             return false;
         } else {
             this.level().broadcastEntityEvent(this, (byte) 4);
             this.playSound(SoundEvents.HOGLIN_ATTACK, 1.0F, this.getVoicePitch());
             FrostBoarAi.onHitTarget(this, (LivingEntity) p_34491_);
-            return HoglinBase.hurtAndThrowTarget(this, (LivingEntity) p_34491_);
+            return HoglinBase.hurtAndThrowTarget(serverLevel, this, (LivingEntity) p_34491_);
         }
     }
 
@@ -165,24 +165,21 @@ public class FrostBoar extends FrostAnimal {
     }
 
     @Override
-    public boolean hurt(DamageSource p_34503_, float p_34504_) {
-        boolean flag = super.hurt(p_34503_, p_34504_);
-        if (this.level().isClientSide) {
-            return false;
-        } else {
-            if (flag && p_34503_.getEntity() instanceof LivingEntity) {
-                FrostBoarAi.wasHurtBy(this, (LivingEntity) p_34503_.getEntity());
-            }
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource p_34503_, float p_34504_) {
+        boolean flag = super.hurtServer(serverLevel, p_34503_, p_34504_);
 
-            return flag;
+        if (flag && p_34503_.getEntity() instanceof LivingEntity) {
+            FrostBoarAi.wasHurtBy(serverLevel, this, (LivingEntity) p_34503_.getEntity());
         }
+
+        return flag;
     }
 
 
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        FrostBoar frostboar = FrostEntities.FROST_BOAR.get().create(p_146743_);
+        FrostBoar frostboar = FrostEntities.FROST_BOAR.get().create(p_146743_, EntitySpawnReason.BREEDING);
         if (frostboar != null) {
             frostboar.setPersistenceRequired();
         }

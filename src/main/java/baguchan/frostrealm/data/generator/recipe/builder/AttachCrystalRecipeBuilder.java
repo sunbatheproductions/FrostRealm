@@ -8,8 +8,9 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,8 +27,8 @@ public class AttachCrystalRecipeBuilder {
         this.addition = p_267264_;
     }
 
-    public static AttachCrystalRecipeBuilder smithingTrim(Ingredient base, Ingredient addition, RecipeCategory p_267269_) {
-        return new AttachCrystalRecipeBuilder(p_267269_, base, addition);
+    public static AttachCrystalRecipeBuilder smithingTrim(Ingredient p_266812_, Ingredient p_266843_, RecipeCategory p_267269_) {
+        return new AttachCrystalRecipeBuilder(p_267269_, p_266812_, p_266843_);
     }
 
     public AttachCrystalRecipeBuilder unlocks(String p_266882_, Criterion<?> p_301261_) {
@@ -35,20 +36,22 @@ public class AttachCrystalRecipeBuilder {
         return this;
     }
 
-    public void save(RecipeOutput p_301110_, ResourceLocation p_266718_) {
-        this.ensureValid(p_266718_);
+    public void save(RecipeOutput p_301110_, ResourceKey<Recipe<?>> p_379691_) {
+        this.ensureValid(p_379691_);
         Advancement.Builder advancement$builder = p_301110_.advancement()
-                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(p_266718_))
-                .rewards(AdvancementRewards.Builder.recipe(p_266718_))
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(p_379691_))
+                .rewards(AdvancementRewards.Builder.recipe(p_379691_))
                 .requirements(AdvancementRequirements.Strategy.OR);
         this.criteria.forEach(advancement$builder::addCriterion);
         AttachCrystalRecipe smithingtrimrecipe = new AttachCrystalRecipe(this.base, this.addition);
-        p_301110_.accept(p_266718_, smithingtrimrecipe, advancement$builder.build(p_266718_.withPrefix("recipes/" + this.category.getFolderName() + "/")));
+        p_301110_.accept(
+                p_379691_, smithingtrimrecipe, advancement$builder.build(p_379691_.location().withPrefix("recipes/" + this.category.getFolderName() + "/"))
+        );
     }
 
-    private void ensureValid(ResourceLocation p_267040_) {
+    private void ensureValid(ResourceKey<Recipe<?>> p_379384_) {
         if (this.criteria.isEmpty()) {
-            throw new IllegalStateException("No way of obtaining recipe " + p_267040_);
+            throw new IllegalStateException("No way of obtaining recipe " + p_379384_.location());
         }
     }
 }

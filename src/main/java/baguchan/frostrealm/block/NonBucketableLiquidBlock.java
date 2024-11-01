@@ -9,11 +9,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Supplier;
-
 public class NonBucketableLiquidBlock extends LiquidBlock {
-    public NonBucketableLiquidBlock(Supplier<? extends FlowingFluid> fluid, Properties p_54695_) {
-        super(fluid.get(), p_54695_);
+    public NonBucketableLiquidBlock(FlowingFluid fluid, Properties p_54695_) {
+        super(fluid, p_54695_);
     }
 
     @Override

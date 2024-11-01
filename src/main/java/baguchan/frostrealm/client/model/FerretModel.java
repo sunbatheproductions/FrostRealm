@@ -5,13 +5,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.11.1
 
 import baguchan.frostrealm.client.animation.BabyAnimations;
 import baguchan.frostrealm.client.animation.FerretAnimations;
-import baguchan.frostrealm.entity.animal.Ferret;
-import net.minecraft.client.model.AgeableHierarchicalModel;
+import baguchan.frostrealm.client.render.state.FerretRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class FerretModel<T extends Ferret> extends AgeableHierarchicalModel<T> {
+public class FerretModel<T extends FerretRenderState> extends EntityModel<T> {
     private final ModelPart realroot;
     private final ModelPart root;
     private final ModelPart body;
@@ -27,7 +27,7 @@ public class FerretModel<T extends Ferret> extends AgeableHierarchicalModel<T> {
     private final ModelPart ear_l;
 
     public FerretModel(ModelPart root) {
-        super(0.5F, 24.0F);
+        super(root);
         this.realroot = root;
         this.root = root.getChild("root");
         this.body = this.root.getChild("body");
@@ -75,27 +75,23 @@ public class FerretModel<T extends Ferret> extends AgeableHierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F);
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
+        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-        float f = ageInTicks - (float) entity.tickCount;
+        float f = entity.partialTick;
 
-        if (entity.isInSittingPose()) {
+        if (entity.isSitting) {
             this.applyStatic(FerretAnimations.sit);
 
         } else {
-            this.animateWalk(FerretAnimations.run, limbSwing, limbSwingAmount * (entity.getRunningScale(f)), 1.0F, 2.5F);
-            this.animateWalk(FerretAnimations.walk, limbSwing, limbSwingAmount * (1.0F - entity.getRunningScale(f)), 1.0F, 5.0F);
+            this.animateWalk(FerretAnimations.run, entity.walkAnimationPos, entity.walkAnimationSpeed * (entity.running), 1.0F, 2.5F);
+            this.animateWalk(FerretAnimations.walk, entity.walkAnimationPos, entity.walkAnimationSpeed * (1.0F - entity.running), 1.0F, 5.0F);
         }
 
-        if (this.young) {
+        if (entity.isBaby) {
             this.applyStatic(BabyAnimations.baby);
         }
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.realroot;
     }
 }

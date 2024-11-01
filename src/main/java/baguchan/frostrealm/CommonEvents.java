@@ -22,6 +22,8 @@ import net.minecraft.server.level.*;
 import net.minecraft.sounds.Musics;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.PolarBear;
@@ -156,9 +158,10 @@ public class CommonEvents {
             if (event.getLevel() instanceof ServerLevel serverLevel) {
                 FrostWeatherSavedData frostWeatherSavedData = FrostWeatherSavedData.get(serverLevel);
                 ChunkMap chunkManager = serverLevel.getChunkSource().chunkMap;
+                ProfilerFiller profiler = Profiler.get();
 
                 if (frostWeatherSavedData.isWeatherActive() && frostWeatherSavedData.getFrostWeather() == FrostWeathers.BLIZZARD.get()) {
-                    serverLevel.getProfiler().push("freeze_weather");
+                    profiler.push("freeze_weather");
                     if (event.getLevel().random.nextInt(8) == 0) {
                         chunkManager.getChunks().forEach(chunkHolder -> {
                             ChunkResult<LevelChunk> optionalChunk = chunkHolder.getEntityTickingChunkFuture().getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK);
@@ -188,9 +191,9 @@ public class CommonEvents {
                             }
                         });
                     }
-                    serverLevel.getProfiler().popPush("freeze_weather");
+                    profiler.popPush("freeze_weather");
                 }
-                serverLevel.getProfiler().push("freeze");
+                profiler.push("freeze");
                     chunkManager.getChunks().forEach(chunkHolder -> {
                         ChunkResult<LevelChunk> optionalChunk = chunkHolder.getEntityTickingChunkFuture().getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK);
                         if (optionalChunk.isSuccess()) {
@@ -230,7 +233,7 @@ public class CommonEvents {
                             });
                         }
                     });
-                serverLevel.getProfiler().popPush("freeze");
+                profiler.popPush("freeze");
             }
         }
     }

@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -75,17 +74,18 @@ public class BearBerryBushBlock extends BushBlock implements BonemealableBlock {
 	}
 
 
-	protected ItemInteractionResult useItemOn(ItemStack p_316304_, BlockState p_57275_, Level p_57276_, BlockPos p_57277_, Player p_57278_, InteractionHand p_57279_, BlockHitResult p_57280_) {
+	@Override
+	protected InteractionResult useItemOn(ItemStack p_316304_, BlockState p_57275_, Level p_57276_, BlockPos p_57277_, Player p_57278_, InteractionHand p_57279_, BlockHitResult p_57280_) {
 		int i = p_57275_.getValue(AGE);
 		boolean flag = i == 3;
 		if (!flag && p_57278_.getItemInHand(p_57279_).is(Items.BONE_MEAL)) {
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+			return InteractionResult.TRY_WITH_EMPTY_HAND;
 		} else if (i > 2) {
 			int j = 1 + p_57276_.random.nextInt(2);
 			popResource(p_57276_, p_57277_, new ItemStack(FrostItems.BEARBERRY.get(), j));
 			p_57276_.playSound(null, p_57277_, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + p_57276_.random.nextFloat() * 0.4F);
 			p_57276_.setBlock(p_57277_, p_57275_.setValue(AGE, Integer.valueOf(1)), 2);
-			return ItemInteractionResult.sidedSuccess(p_57276_.isClientSide);
+			return InteractionResult.SUCCESS_SERVER;
 		} else {
 			return super.useItemOn(p_316304_, p_57275_, p_57276_, p_57277_, p_57278_, p_57279_, p_57280_);
 		}

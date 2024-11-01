@@ -3,9 +3,7 @@
   "category": "food",
   "cookingtime": 100,
   "experience": 0.1,
-  "ingredient": {
-    "item": "frostrealm:frozen_fruit"
-  },
+  "ingredient": "frostrealm:frozen_fruit",
   "result": {
     "count": 1,
     "id": "frostrealm:melted_fruit"

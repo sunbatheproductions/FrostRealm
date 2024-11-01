@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "frostrealm:glimmerrock_block"
-    }
+    "frostrealm:glimmerrock_block"
   ],
   "result": {
     "count": 9,

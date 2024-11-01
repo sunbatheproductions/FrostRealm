@@ -2,21 +2,11 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "frostrealm:glacinium_crystal"
-    },
-    {
-      "item": "frostrealm:glacinium_crystal"
-    },
-    {
-      "item": "frostrealm:frost_crystal"
-    },
-    {
-      "item": "frostrealm:frost_crystal"
-    },
-    {
-      "item": "frostrealm:astrium_ingot"
-    }
+    "frostrealm:glacinium_crystal",
+    "frostrealm:glacinium_crystal",
+    "frostrealm:frost_crystal",
+    "frostrealm:frost_crystal",
+    "frostrealm:astrium_ingot"
   ],
   "result": {
     "count": 1,

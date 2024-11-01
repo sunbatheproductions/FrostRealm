@@ -2,24 +2,23 @@ package baguchan.frostrealm.item;
 
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.YetiFurArmorModel;
+import baguchan.frostrealm.registry.FrostArmorMaterials;
 import baguchan.frostrealm.registry.FrostItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentModel;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import org.jetbrains.annotations.NotNull;
 
-public class YetiFurArmorItem extends ArmorItem {
-	public YetiFurArmorItem(Holder<ArmorMaterial> p_40386_, Type p_40387_, Properties p_40388_) {
+public class YetiFurArmorItem extends FrostArmorItem {
+	public YetiFurArmorItem(FrostArmorMaterials.FrostArmorMaterial p_40386_, ArmorType p_40387_, Properties p_40388_) {
         super(p_40386_, p_40387_, p_40388_);
     }
 
@@ -31,14 +30,15 @@ public class YetiFurArmorItem extends ArmorItem {
 	public static final class ArmorRender implements IClientItemExtensions {
 		public static final ArmorRender INSTANCE = new ArmorRender();
 
-
 		@Override
-		public @NotNull Model getGenericArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+		public Model getGenericArmorModel(ItemStack itemStack, EquipmentModel.LayerType layerType, Model original) {
 			EntityModelSet models = Minecraft.getInstance().getEntityModels();
-			ModelPart root = models.bakeLayer(equipmentSlot == EquipmentSlot.LEGS ? FrostModelLayers.YETI_FUR_ARMOR_INNER : FrostModelLayers.YETI_FUR_ARMOR_OUTER);
+			ModelPart root = models.bakeLayer(layerType == EquipmentModel.LayerType.HUMANOID_LEGGINGS ? FrostModelLayers.YETI_FUR_ARMOR_INNER : FrostModelLayers.YETI_FUR_ARMOR_OUTER);
 
 			YetiFurArmorModel<?> model2 = new YetiFurArmorModel<>(root);
-			ClientHooks.copyModelProperties(original, model2);
+			if (original instanceof HumanoidModel humanoidModel) {
+				ClientHooks.copyModelProperties(humanoidModel, model2);
+			}
 			return model2;
 		}
 

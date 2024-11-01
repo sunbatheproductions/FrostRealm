@@ -3,9 +3,7 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.1.1
 // Paste this class into your mod and generate all required imports
 
 
-import baguchan.frostrealm.entity.animal.SnowPileQuail;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import baguchan.frostrealm.client.render.state.SnowPileQuailRenderState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -13,7 +11,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
-public class SnowPileQuailModel<T extends SnowPileQuail> extends EntityModel<T> implements HeadedModel {
+public class SnowPileQuailModel<T extends SnowPileQuailRenderState> extends EntityModel<T> implements HeadedModel {
 	public final ModelPart body;
 	private final ModelPart legR;
 	private final ModelPart legL;
@@ -22,6 +20,7 @@ public class SnowPileQuailModel<T extends SnowPileQuail> extends EntityModel<T> 
 	private final ModelPart wingL;
 
 	public SnowPileQuailModel(ModelPart root) {
+		super(root);
 		this.body = root.getChild("body");
 		this.legR = this.body.getChild("legR");
 		this.legL = this.body.getChild("legL");
@@ -51,23 +50,19 @@ public class SnowPileQuailModel<T extends SnowPileQuail> extends EntityModel<T> 
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.xRot = headPitch * ((float) Math.PI / 180F);
-		this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-		this.legR.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-		this.legL.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+	public void setupAnim(T entity) {
+		super.setupAnim(entity);
+		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.legR.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed;
+		this.legL.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;
 		this.wingR.zRot = 0.0F;
 		this.wingL.zRot = -0.0F;
 
-		if (!entity.onGround()) {
+		/*if (!entity.onGround()) {
 			this.wingR.zRot = 0.6F + 0.8F * Mth.sin(2.4F * ageInTicks);
 			this.wingL.zRot = -0.6F + -0.8F * Mth.sin(2.4F * ageInTicks);
-		}
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-		body.render(poseStack, buffer, packedLight, packedOverlay, color);
+		}*/
 	}
 
 	@Override

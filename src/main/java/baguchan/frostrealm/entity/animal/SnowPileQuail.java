@@ -5,6 +5,7 @@ import baguchan.frostrealm.entity.IHasEgg;
 import baguchan.frostrealm.entity.goal.BreedAndEggGoal;
 import baguchan.frostrealm.registry.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -28,7 +29,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,8 +41,6 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	private static final EntityDimensions BABY_DIMENSIONS = FrostEntities.SNOWPILE_QUAIL.get().getDimensions().scale(0.5F).withEyeHeight(0.2F);
 	private static final EntityDataAccessor<Boolean> ANGRY = SynchedEntityData.defineId(SnowPileQuail.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Boolean> HAS_EGG = SynchedEntityData.defineId(SnowPileQuail.class, EntityDataSerializers.BOOLEAN);
-
-	private static final Ingredient FOOD_ITEMS = Ingredient.of(FrostTags.Items.SNOWPILE_FOODS);
 
 	@Nullable
 	private BlockPos homeTarget;
@@ -70,7 +68,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 			return !((Ferret) p_28590_).isTame();
 		}));
         this.goalSelector.addGoal(4, new BreedAndEggGoal<>(this, 1.0D));
-		this.goalSelector.addGoal(5, new TemptGoal(this, 1.0D, FOOD_ITEMS, false));
+		this.goalSelector.addGoal(5, new TemptGoal(this, 1.0D, (item) -> item.is(FrostTags.Items.SNOWPILE_FOODS), false));
 		this.goalSelector.addGoal(6, new FollowParentGoal(this, 1.1D));
 		this.goalSelector.addGoal(7, new MoveToGoal(this, 8.0D, 1.1D));
 		this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
@@ -89,7 +87,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_146746_, DifficultyInstance p_146747_, MobSpawnType p_146748_, @Nullable SpawnGroupData p_146749_) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_146746_, DifficultyInstance p_146747_, EntitySpawnReason p_146748_, @Nullable SpawnGroupData p_146749_) {
 		this.populateDefaultEquipmentSlots(p_146746_.getRandom(), p_146747_);
 		return super.finalizeSpawn(p_146746_, p_146747_, p_146748_, p_146749_);
 	}
@@ -142,7 +140,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 
 					this.ticksSinceEaten = 0;
 				} else if (this.ticksSinceEaten > 560 && this.random.nextFloat() < 0.1F) {
-					this.playSound(this.getEatingSound(itemstack), 1.0F, 1.0F);
+					this.playSound(SoundEvents.PARROT_EAT, 1.0F, 1.0F);
 					this.level().broadcastEntityEvent(this, (byte) 45);
 				}
 			}
@@ -214,16 +212,16 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	public boolean canHoldItem(ItemStack p_28578_) {
 		Item item = p_28578_.getItem();
 		ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-		return itemstack.isEmpty() || this.ticksSinceEaten > 0 && p_28578_.getFoodProperties(this) != null && !p_28578_.is(ItemTags.MEAT) && itemstack.getFoodProperties(this) == null;
+		return itemstack.isEmpty() || this.ticksSinceEaten > 0 && p_28578_.get(DataComponents.FOOD) != null && !p_28578_.is(ItemTags.MEAT) && p_28578_.get(DataComponents.FOOD) == null;
 	}
 
 	private boolean canEat(ItemStack p_28598_) {
-		return p_28598_.getFoodProperties(this) != null && !p_28598_.is(ItemTags.MEAT) && this.getTarget() == null && this.onGround() && !this.isSleeping();
+		return p_28598_.get(DataComponents.FOOD) != null && !p_28598_.is(ItemTags.MEAT) && this.getTarget() == null && this.onGround() && !this.isSleeping();
 	}
 
 	@Override
 	public boolean isFood(ItemStack p_28271_) {
-		return FOOD_ITEMS.test(p_28271_);
+		return p_28271_.is(FrostTags.Items.SNOWPILE_FOODS);
 	}
 
 	@Override
@@ -265,7 +263,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	@Nullable
 	@Override
 	public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob ageableMob) {
-		return FrostEntities.SNOWPILE_QUAIL.get().create(level);
+		return FrostEntities.SNOWPILE_QUAIL.get().create(level, EntitySpawnReason.BREEDING);
 	}
 
 	@Override

@@ -3,12 +3,10 @@ package baguchan.frostrealm.fluid;
 import baguchan.frostrealm.registry.FrostBlocks;
 import baguchan.frostrealm.registry.FrostFluidTypes;
 import baguchan.frostrealm.registry.FrostFluids;
-import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.shorts.Short2BooleanMap;
-import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
@@ -72,7 +70,7 @@ public abstract class HotSpringFluid extends WaterFluid {
     }
 
     @Override
-    protected boolean canConvertToSource(Level p_256670_) {
+    protected boolean canConvertToSource(ServerLevel p_256670_) {
         return false;
     }
 
@@ -113,7 +111,7 @@ public abstract class HotSpringFluid extends WaterFluid {
     }
 
     @Override
-    protected int getSlopeDistance(LevelReader p_76027_, BlockPos p_76028_, int p_76029_, Direction p_76030_, BlockState p_76031_, BlockPos p_76032_, Short2ObjectMap<Pair<BlockState, FluidState>> p_76033_, Short2BooleanMap p_76034_) {
+    protected int getSlopeDistance(LevelReader p_76027_, BlockPos p_76028_, int p_76029_, Direction p_76030_, BlockState p_76031_, SpreadContext p_364491_) {
         return 4;
     }
 

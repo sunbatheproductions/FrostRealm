@@ -192,9 +192,11 @@ public class BlockLootTables extends BlockLootSubProvider {
 	}
 
 	protected LootTable.Builder createDoublePlantWithFrostSeedDrops(Block p_248590_, Block p_248735_) {
+		HolderLookup.RegistryLookup<Block> registrylookup = this.registries.lookupOrThrow(Registries.BLOCK);
+
 		LootPoolEntryContainer.Builder<?> builder = LootItem.lootTableItem(p_248735_)
 				.apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F)))
-				.when(HAS_SHEARS)
+				.when(this.hasShears())
 				.otherwise(
 						((LootPoolSingletonContainer.Builder) this.applyExplosionCondition(p_248590_, LootItem.lootTableItem(FrostItems.RYE_SEEDS.get())))
 								.when(LootItemRandomChanceCondition.randomChance(0.125F))
@@ -212,7 +214,7 @@ public class BlockLootTables extends BlockLootSubProvider {
 												LocationPredicate.Builder.location()
 														.setBlock(
 																BlockPredicate.Builder.block()
-																		.of(p_248590_)
+																		.of(registrylookup, p_248590_)
 																		.setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER))
 														),
 												new BlockPos(0, 1, 0)
@@ -231,7 +233,7 @@ public class BlockLootTables extends BlockLootSubProvider {
 												LocationPredicate.Builder.location()
 														.setBlock(
 																BlockPredicate.Builder.block()
-																		.of(p_248590_)
+																		.of(registrylookup, p_248590_)
 																		.setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER))
 														),
 												new BlockPos(0, -1, 0)
@@ -251,14 +253,14 @@ public class BlockLootTables extends BlockLootSubProvider {
 		HolderLookup.RegistryLookup<Enchantment> registrylookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
 
-        return createSilkTouchOrShearsDispatchTable(block, applyExplosionCondition(block, LootItem.lootTableItem(nonSilk.asItem())).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), nonSilkFortune))).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(HAS_SHEARS).add(applyExplosionDecay(block, LootItem.lootTableItem(Items.STICK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))));
+		return createSilkTouchOrShearsDispatchTable(block, applyExplosionCondition(block, LootItem.lootTableItem(nonSilk.asItem())).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), nonSilkFortune))).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(this.hasShears()).add(applyExplosionDecay(block, LootItem.lootTableItem(Items.STICK).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))));
 	}
 
 	protected LootTable.Builder createFrostbiteLeavesDrops(Block p_124264_, Block p_124265_, float... p_124266_) {
 		HolderLookup.RegistryLookup<Enchantment> registrylookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
 
-        return createLeavesDrops(p_124264_, p_124265_, p_124266_).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(HAS_SHEARS).add(applyExplosionCondition(p_124264_, LootItem.lootTableItem(FrostItems.FROZEN_FRUIT.get())).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), 0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F))));
+		return createLeavesDrops(p_124264_, p_124265_, p_124266_).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(this.hasShears()).add(applyExplosionCondition(p_124264_, LootItem.lootTableItem(FrostItems.FROZEN_FRUIT.get())).when(BonusLevelTableCondition.bonusLevelFlatChance(registrylookup.getOrThrow(Enchantments.FORTUNE), 0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F))));
 	}
 
 	protected LootTable.Builder createFrostCrystalOreDrops(Block p_176049_) {

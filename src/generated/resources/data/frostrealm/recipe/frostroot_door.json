@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "D": {
-      "item": "frostrealm:frostroot_planks"
-    }
+    "D": "frostrealm:frostroot_planks"
   },
   "pattern": [
     "DD",

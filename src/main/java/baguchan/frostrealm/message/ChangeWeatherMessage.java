@@ -29,7 +29,7 @@ public class ChangeWeatherMessage implements CustomPacketPayload {
 	}
 
 	public ChangeWeatherMessage(FriendlyByteBuf buf) {
-		this(FrostWeathers.getRegistry().get(buf.readResourceLocation()));
+		this(FrostWeathers.getRegistry().getValue(buf.readResourceLocation()));
 	}
 
     public static void handle(ChangeWeatherMessage message, IPayloadContext context) {

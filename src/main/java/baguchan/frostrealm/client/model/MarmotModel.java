@@ -3,16 +3,14 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.0.5
 // Paste this class into your mod and generate all required imports
 
 
-import baguchan.frostrealm.entity.animal.Marmot;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import baguchan.frostrealm.client.render.state.MarmotRenderState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
-public class MarmotModel<T extends Marmot> extends EntityModel<T> {
+public class MarmotModel<T extends MarmotRenderState> extends EntityModel<T> {
 	private final ModelPart head;
 	private final ModelPart body;
 	private final ModelPart handR;
@@ -21,6 +19,7 @@ public class MarmotModel<T extends Marmot> extends EntityModel<T> {
 	private final ModelPart legL;
 
 	public MarmotModel(ModelPart root) {
+		super(root);
 		this.head = root.getChild("head");
 		this.body = root.getChild("body");
 		this.handR = root.getChild("handR");
@@ -49,16 +48,17 @@ public class MarmotModel<T extends Marmot> extends EntityModel<T> {
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-		this.head.xRot = headPitch * ((float) Math.PI / 180F);
+	public void setupAnim(T entity) {
+		super.setupAnim(entity);
+		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-		this.legR.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
-		this.legL.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+		this.legR.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed * 0.5F;
+		this.legL.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed * 0.5F;
 		this.legR.zRot = 0.0F;
 		this.legL.zRot = 0.0F;
-		this.handR.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
-		this.handL.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+		this.handR.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed * 0.5F;
+		this.handL.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed * 0.5F;
 		this.handR.zRot = 0.0F;
 		this.handL.zRot = 0.0F;
 
@@ -76,7 +76,7 @@ public class MarmotModel<T extends Marmot> extends EntityModel<T> {
 		this.legR.z = 5.0F;
 		this.legL.z = 5.0F;
 
-		if (entity.isStanding()) {
+		if (entity.scream) {
 			this.body.xRot = (float) -(Math.PI / 2F);
 			this.body.y = 21.0F;
 			this.body.z = 3.0F;
@@ -89,15 +89,5 @@ public class MarmotModel<T extends Marmot> extends EntityModel<T> {
 			this.legR.z = 2.0F;
 			this.legL.z = 2.0F;
 		}
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-		head.render(poseStack, buffer, packedLight, packedOverlay, color);
-		body.render(poseStack, buffer, packedLight, packedOverlay, color);
-		handR.render(poseStack, buffer, packedLight, packedOverlay, color);
-		handL.render(poseStack, buffer, packedLight, packedOverlay, color);
-		legR.render(poseStack, buffer, packedLight, packedOverlay, color);
-		legL.render(poseStack, buffer, packedLight, packedOverlay, color);
 	}
 }

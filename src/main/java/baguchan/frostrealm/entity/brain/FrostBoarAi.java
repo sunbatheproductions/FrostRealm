@@ -6,6 +6,7 @@ import baguchan.frostrealm.registry.FrostMemoryModuleType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.TimeUtil;
@@ -33,8 +34,8 @@ public class FrostBoarAi {
     private static final TargetingConditions ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT = TargetingConditions.forCombat().range(20.0D).ignoreLineOfSight().ignoreInvisibilityTesting();
 
 
-    public static boolean isEntityAttackableIgnoringLineOfSight(LivingEntity p_182378_, LivingEntity p_182379_) {
-        return p_182378_.getBrain().isMemoryValue(MemoryModuleType.ATTACK_TARGET, p_182379_) ? ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT.test(p_182378_, p_182379_) : ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT.test(p_182378_, p_182379_);
+    public static boolean isEntityAttackableIgnoringLineOfSight(ServerLevel serverLevel, LivingEntity p_182378_, LivingEntity p_182379_) {
+        return p_182378_.getBrain().isMemoryValue(MemoryModuleType.ATTACK_TARGET, p_182379_) ? ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT.test(serverLevel, p_182378_, p_182379_) : ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT.test(serverLevel, p_182378_, p_182379_);
     }
 
     public static Brain<?> makeBrain(FrostBoar frostBoar, Brain<FrostBoar> p_149291_) {
@@ -65,7 +66,7 @@ public class FrostBoarAi {
     }
 
     private static void initCoreActivity(Brain<FrostBoar> p_149307_) {
-        p_149307_.addActivity(Activity.CORE, 0, ImmutableList.of(StartAttacking.create(FrostBoarAi::findNearestValidAttackTarget), new Swim(0.8F), new LookAtTargetSink(45, 90), new MoveToTargetSink(), new CountDownCooldownTicks(MemoryModuleType.TEMPTATION_COOLDOWN_TICKS)));
+        p_149307_.addActivity(Activity.CORE, 0, ImmutableList.of(StartAttacking.create(FrostBoarAi::findNearestValidAttackTarget), new Swim<>(0.8F), new LookAtTargetSink(45, 90), new MoveToTargetSink(), new CountDownCooldownTicks(MemoryModuleType.TEMPTATION_COOLDOWN_TICKS)));
     }
 
     private static void initIdleActivity(Brain<FrostBoar> p_149309_) {
@@ -99,12 +100,12 @@ public class FrostBoarAi {
         }
     }
 
-    private static Optional<? extends LivingEntity> findNearestValidAttackTarget(FrostBoar p_34611_) {
+    private static Optional<? extends LivingEntity> findNearestValidAttackTarget(ServerLevel serverLevel, FrostBoar p_34611_) {
         boolean flag = !isBreeding(p_34611_);
 
         if (flag) {
             Optional<LivingEntity> optional = BehaviorUtils.getLivingEntityFromUUIDMemory(p_34611_, MemoryModuleType.ANGRY_AT);
-            if (optional.isPresent() && isEntityAttackableIgnoringLineOfSight(p_34611_, optional.get())) {
+            if (optional.isPresent() && isEntityAttackableIgnoringLineOfSight(serverLevel, p_34611_, optional.get())) {
                 return optional;
             } else {
                 Optional<List<LivingEntity>> listOptional = p_34611_.getBrain().getMemory(FrostMemoryModuleType.NEAREST_ENEMYS.get());
@@ -139,32 +140,32 @@ public class FrostBoarAi {
     }
 
 
-    public static void wasHurtBy(FrostBoar p_34596_, LivingEntity p_34597_) {
+    public static void wasHurtBy(ServerLevel serverLevel, FrostBoar p_34596_, LivingEntity p_34597_) {
         if (!(p_34597_ instanceof FrostBoar)) {
             Brain<FrostBoar> brain = p_34596_.getBrain();
             brain.eraseMemory(MemoryModuleType.BREED_TARGET);
             if (p_34596_.isBaby()) {
                 retreatFromNearestTarget(p_34596_, p_34597_);
-                if (isEntityAttackableIgnoringLineOfSight(p_34596_, p_34597_)) {
+                if (isEntityAttackableIgnoringLineOfSight(serverLevel, p_34596_, p_34597_)) {
                     broadcastAttackTarget(p_34596_, p_34597_);
                 }
             } else if (!isEnoughFrostBoarOrHealth(p_34596_)) {
                 retreatFromNearestTarget(p_34596_, p_34597_);
-                if (isEntityAttackableIgnoringLineOfSight(p_34596_, p_34597_)) {
+                if (isEntityAttackableIgnoringLineOfSight(serverLevel, p_34596_, p_34597_)) {
                     setAttackTarget(p_34596_, p_34597_);
                 }
             } else {
-                maybeRetaliate(p_34596_, p_34597_);
+                maybeRetaliate(serverLevel, p_34596_, p_34597_);
             }
         }
     }
 
 
-    private static void maybeRetaliate(FrostBoar p_34625_, LivingEntity p_34626_) {
+    private static void maybeRetaliate(ServerLevel serverLevel, FrostBoar p_34625_, LivingEntity p_34626_) {
         if (!p_34625_.getBrain().isActive(Activity.AVOID) || p_34626_.getType() != FrostEntities.YETI.get()) {
             if (p_34626_.getType() != FrostEntities.FROST_BOAR.get()) {
                 if (!BehaviorUtils.isOtherTargetMuchFurtherAwayThanCurrentAttackTarget(p_34625_, p_34626_, 4.0D)) {
-                    if (isEntityAttackableIgnoringLineOfSight(p_34625_, p_34626_)) {
+                    if (isEntityAttackableIgnoringLineOfSight(serverLevel, p_34625_, p_34626_)) {
                         setAttackTarget(p_34625_, p_34626_);
                         broadcastAttackTarget(p_34625_, p_34626_);
                     }

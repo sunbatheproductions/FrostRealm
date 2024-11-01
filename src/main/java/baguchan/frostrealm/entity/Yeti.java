@@ -1,6 +1,5 @@
 package baguchan.frostrealm.entity;
 
-import bagu_chan.bagus_lib.register.ModSensors;
 import baguchan.frostrealm.entity.brain.YetiAi;
 import baguchan.frostrealm.entity.path.FrostPathNavigation;
 import baguchan.frostrealm.registry.*;
@@ -8,6 +7,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -16,6 +16,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
@@ -29,6 +31,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -44,7 +47,7 @@ public class Yeti extends AgeableMob {
 	private static final EntityDataAccessor<String> DATA_STATE = SynchedEntityData.defineId(Yeti.class, EntityDataSerializers.STRING);
 	public static final EntityDataAccessor<Long> LAST_POSE_CHANGE_TICK = SynchedEntityData.defineId(Yeti.class, EntityDataSerializers.LONG);
 
-	protected static final ImmutableList<? extends SensorType<? extends Sensor<? super Yeti>>> SENSOR_TYPES = ImmutableList.of(ModSensors.SMART_NEAREST_LIVING_ENTITY_SENSOR.get(), SensorType.NEAREST_ADULT, SensorType.HURT_BY
+	protected static final ImmutableList<? extends SensorType<? extends Sensor<? super Yeti>>> SENSOR_TYPES = ImmutableList.of(baguchi.bagus_lib.register.ModSensors.SMART_NEAREST_LIVING_ENTITY_SENSOR.get(), SensorType.NEAREST_ADULT, SensorType.HURT_BY
 			, FrostSensors.YETI_SENSOR.get(), FrostSensors.ENEMY_SENSOR.get(), SensorType.NEAREST_ITEMS);
 	protected static final ImmutableList<? extends MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(MemoryModuleType.BREED_TARGET, MemoryModuleType.NEAREST_LIVING_ENTITIES, MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, MemoryModuleType.LOOK_TARGET, MemoryModuleType.WALK_TARGET, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE, MemoryModuleType.PATH, MemoryModuleType.ATTACK_TARGET, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryModuleType.NEAREST_VISIBLE_ADULT, MemoryModuleType.HURT_BY_ENTITY, MemoryModuleType.NEAREST_ATTACKABLE, MemoryModuleType.TEMPTING_PLAYER, MemoryModuleType.TEMPTATION_COOLDOWN_TICKS, MemoryModuleType.IS_TEMPTED, MemoryModuleType.HAS_HUNTING_COOLDOWN, MemoryModuleType.IS_PANICKING
 			, FrostMemoryModuleType.NEAREST_ENEMYS.get(), FrostMemoryModuleType.NEAREST_ENEMY_COUNT.get(), MemoryModuleType.AVOID_TARGET, FrostMemoryModuleType.NEAREST_YETIS.get(), FrostMemoryModuleType.YETI_COUNT.get()
@@ -75,13 +78,40 @@ public class Yeti extends AgeableMob {
 	}
 
 	@Override
-	protected void customServerAiStep() {
-		this.level().getProfiler().push("boarBrain");
-		this.getBrain().tick((ServerLevel) this.level(), this);
-		this.level().getProfiler().pop();
-		this.level().getProfiler().push("boarActivityUpdate");
+	protected void customServerAiStep(ServerLevel serverLevel) {
+		ProfilerFiller profiler = Profiler.get();
+		profiler.push("boarBrain");
+		this.getBrain().tick(serverLevel, this);
+		profiler.pop();
+		profiler.push("boarActivityUpdate");
 		YetiAi.updateActivity(this);
-		this.level().getProfiler().pop();
+		profiler.pop();
+
+		if (this.isAlive()) {
+			ItemStack offhand = this.getItemInHand(InteractionHand.OFF_HAND);
+
+			if (!this.isUsingItem() && offhand.isEmpty()) {
+				ItemStack food = ItemStack.EMPTY;
+
+				if (this.getHealth() < this.getMaxHealth() && this.random.nextFloat() < 0.0025F) {
+					food = this.findFood();
+				}
+
+				if (!food.isEmpty()) {
+					this.setItemSlot(EquipmentSlot.OFFHAND, food);
+					this.startUsingItem(InteractionHand.OFF_HAND);
+				}
+			}
+
+			if (!this.isBaby()) {
+				if (offhand.is(FrostTags.Items.YETI_BIG_CURRENCY) || offhand.is(FrostTags.Items.YETI_CURRENCY)) {
+					if (--this.holdTime <= 0) {
+						YetiAi.stopHoldingOffHandItem(serverLevel, this, true);
+					}
+				}
+			}
+		}
+
 	}
 
 	protected Brain.Provider<Yeti> brainProvider() {
@@ -220,8 +250,10 @@ public class Yeti extends AgeableMob {
 			if (!this.useItem.isEmpty() && this.isUsingItem()) {
 				ItemStack copy = this.useItem.copy();
 
-				if (copy.getFoodProperties(this) != null) {
-					this.heal(copy.getFoodProperties(this).nutrition());
+				if (copy.get(DataComponents.FOOD) != null) {
+					FoodProperties foodproperties = copy.get(DataComponents.FOOD);
+					float f = foodproperties != null ? (float) foodproperties.nutrition() : 1.0F;
+					this.heal(f);
 				}
 			}
 		}
@@ -264,30 +296,6 @@ public class Yeti extends AgeableMob {
 	@Override
 	public void aiStep() {
 		this.updateSwingTime();
-		if (!this.level().isClientSide && this.isAlive()) {
-			ItemStack offhand = this.getItemInHand(InteractionHand.OFF_HAND);
-
-			if (!this.isUsingItem() && offhand.isEmpty()) {
-				ItemStack food = ItemStack.EMPTY;
-
-				if (this.getHealth() < this.getMaxHealth() && this.random.nextFloat() < 0.0025F) {
-					food = this.findFood();
-				}
-
-				if (!food.isEmpty()) {
-					this.setItemSlot(EquipmentSlot.OFFHAND, food);
-					this.startUsingItem(InteractionHand.OFF_HAND);
-				}
-			}
-
-			if (!this.isBaby()) {
-				if (offhand.is(FrostTags.Items.YETI_BIG_CURRENCY) || offhand.is(FrostTags.Items.YETI_CURRENCY)) {
-					if (--this.holdTime <= 0) {
-						YetiAi.stopHoldingOffHandItem(this, true);
-					}
-				}
-			}
-		}
 
 		super.aiStep();
 	}
@@ -296,26 +304,27 @@ public class Yeti extends AgeableMob {
 	private ItemStack findFood() {
 		for (int i = 0; i < this.inventory.getContainerSize(); ++i) {
 			ItemStack itemstack = this.inventory.getItem(i);
-			if (!itemstack.isEmpty() && itemstack.getFoodProperties(this) != null) {
+			if (!itemstack.isEmpty() && itemstack.get(DataComponents.FOOD) != null) {
 				return itemstack.split(1);
 			}
 		}
 		return ItemStack.EMPTY;
 	}
 
+	@Override
 
-	public boolean wantsToPickUp(ItemStack p_34777_) {
-		return EventHooks.canEntityGrief(this.level(), this) && this.canPickUpLoot() && YetiAi.wantsToPickup(this, p_34777_);
+	public boolean wantsToPickUp(ServerLevel serverLevel, ItemStack p_34777_) {
+		return EventHooks.canEntityGrief(serverLevel, this) && this.canPickUpLoot() && YetiAi.wantsToPickup(this, p_34777_);
 	}
 
 	@Override
-	public void pickUpItem(ItemEntity p_175445_1_) {
+	public void pickUpItem(ServerLevel serverLevel, ItemEntity p_175445_1_) {
 		ItemStack itemstack = p_175445_1_.getItem();
 		Item item = itemstack.getItem();
 		if (itemstack.is(FrostTags.Items.YETI_CURRENCY) && this.isAdult()) {
 			this.onItemPickup(p_175445_1_);
 			this.take(p_175445_1_, 1);
-			YetiAi.holdInOffHand(this, itemstack.split(1));
+			YetiAi.holdInOffHand(serverLevel, this, itemstack.split(1));
 			this.setState(State.TRADE);
 			if (itemstack.isEmpty()) {
 				p_175445_1_.discard();
@@ -323,7 +332,7 @@ public class Yeti extends AgeableMob {
 				itemstack.setCount(itemstack.getCount());
 			}
 			this.holdTime = 200;
-		} else if (itemstack.getFoodProperties(this) != null) {
+		} else if (itemstack.get(DataComponents.FOOD) != null) {
 			this.onItemPickup(p_175445_1_);
 			this.take(p_175445_1_, itemstack.getCount());
 			ItemStack itemstack1 = this.inventory.addItem(itemstack);
@@ -333,7 +342,7 @@ public class Yeti extends AgeableMob {
 				itemstack.setCount(itemstack1.getCount());
 			}
 		} else {
-			super.pickUpItem(p_175445_1_);
+			super.pickUpItem(serverLevel, p_175445_1_);
 		}
 	}
 
@@ -349,20 +358,10 @@ public class Yeti extends AgeableMob {
 		return this.inventory.canAddItem(p_34781_);
 	}
 
-	protected boolean canReplaceCurrentItem(ItemStack p_34788_) {
-		EquipmentSlot equipmentslot = this.getEquipmentSlotForItem(p_34788_);
-		ItemStack itemstack = this.getItemBySlot(equipmentslot);
-		return this.canReplaceCurrentItem(p_34788_, itemstack);
-	}
-
-	private boolean wantsFood(ItemStack p_213672_1_) {
-		return p_213672_1_.getFoodProperties(this) != null;
-	}
-
-
-	protected void dropEquipment() {
-		super.dropEquipment();
-		this.inventory.removeAllItems().forEach(this::spawnAtLocation);
+	@Override
+	protected void dropEquipment(ServerLevel serverLevel) {
+		super.dropEquipment(serverLevel);
+		this.inventory.removeAllItems().forEach(item -> spawnAtLocation(serverLevel, item));
 	}
 	public void setHoldTime(int holdTime) {
 		this.holdTime = holdTime;
@@ -410,10 +409,10 @@ public class Yeti extends AgeableMob {
 
 	}
 
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29533_, DifficultyInstance p_29534_, MobSpawnType p_29535_, @Nullable SpawnGroupData p_29536_) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29533_, DifficultyInstance p_29534_, EntitySpawnReason p_29535_, @Nullable SpawnGroupData p_29536_) {
 		if (p_29536_ == null) {
 
-			if (p_29535_ == MobSpawnType.PATROL) {
+			if (p_29535_ == EntitySpawnReason.PATROL) {
 				p_29536_ = new YetiGroupData(true, 0);
 			} else {
 				p_29536_ = new YetiGroupData(false, 1F);
@@ -423,7 +422,7 @@ public class Yeti extends AgeableMob {
 		YetiAi.initMemories(this, p_29533_.getRandom(), p_29535_);
 
 		this.resetLastPoseChangeTickToFullStand(p_29533_.getLevel().getGameTime());
-		if (p_29535_ == MobSpawnType.STRUCTURE) {
+		if (p_29535_ == EntitySpawnReason.STRUCTURE) {
 			GlobalPos globalpos = GlobalPos.of(p_29533_.getLevel().dimension(), this.blockPosition());
 			this.getBrain().setMemory(MemoryModuleType.HOME, globalpos);
 		}
@@ -441,23 +440,23 @@ public class Yeti extends AgeableMob {
 	}
 
 	@Override
-	public boolean doHurtTarget(Entity p_21372_) {
+	public boolean doHurtTarget(ServerLevel serverLevel, Entity p_21372_) {
 		if (p_21372_ instanceof LivingEntity) {
 			YetiAi.onHitTarget(this, (LivingEntity) p_21372_);
 		}
-		return super.doHurtTarget(p_21372_);
+		return super.doHurtTarget(serverLevel, p_21372_);
 	}
 
 	@Override
-	public boolean hurt(DamageSource p_34503_, float p_34504_) {
-		boolean flag = super.hurt(p_34503_, p_34504_);
+	public boolean hurtServer(ServerLevel serverLevel, DamageSource p_34503_, float p_34504_) {
+		boolean flag = super.hurtServer(serverLevel, p_34503_, p_34504_);
 		if (this.level().isClientSide) {
 			return false;
 		} else {
 			this.standUpInstantly();
-			YetiAi.stopHoldingOffHandItem(this, false);
+			YetiAi.stopHoldingOffHandItem(serverLevel, this, false);
 			if (flag && p_34503_.getEntity() instanceof LivingEntity) {
-				YetiAi.wasHurtBy(this, (LivingEntity) p_34503_.getEntity());
+				YetiAi.wasHurtBy(serverLevel, this, (LivingEntity) p_34503_.getEntity());
 			}
 
 			return flag;
@@ -472,7 +471,7 @@ public class Yeti extends AgeableMob {
 	@Nullable
 	@Override
 	public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-		return FrostEntities.YETI.get().create(p_146743_);
+		return FrostEntities.YETI.get().create(p_146743_, EntitySpawnReason.BREEDING);
 	}
 
 	@Override

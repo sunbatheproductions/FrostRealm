@@ -1,17 +1,18 @@
 package baguchan.frostrealm.entity.hostile;
 
-import bagu_chan.bagus_lib.entity.AnimationScale;
-import bagu_chan.bagus_lib.entity.goal.AnimateAttackGoal;
 import baguchan.frostrealm.entity.IGuardMob;
 import baguchan.frostrealm.entity.goal.CounterGoal;
 import baguchan.frostrealm.entity.goal.GuardAndCounterAnimationGoal;
 import baguchan.frostrealm.entity.utils.GuardHandler;
 import baguchan.frostrealm.registry.FrostItems;
 import baguchan.frostrealm.utils.LookUtils;
+import baguchi.bagus_lib.entity.AnimationScale;
+import baguchi.bagus_lib.entity.goal.AnimateAttackGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -48,7 +49,7 @@ public class Seeker extends AbstractSkeleton implements IGuardMob {
 
     public final AnimationState attackAnimationState = new AnimationState();
     public final AnimationState counterAnimationState = new AnimationState();
-    public final AnimationScale guardAnimationScale = new AnimationScale(0.2F);
+    public AnimationScale guardAnimationScale = new AnimationScale(0.2F);
     public final GuardHandler guardHandler = new GuardHandler(2);
     public GuardAndCounterAnimationGoal guardAnimationGoal;
     public CounterGoal counterGoal;
@@ -187,16 +188,16 @@ public class Seeker extends AbstractSkeleton implements IGuardMob {
     }
 
     @Override
-    public boolean doHurtTarget(Entity p_21372_) {
+    public boolean doHurtTarget(ServerLevel serverLevel, Entity p_21372_) {
         if (this.getMainHandItem().is(FrostItems.FROST_SPEAR.get())) {
             p_21372_.setTicksFrozen(Mth.clamp(p_21372_.getTicksFrozen() + 100, 0, 600));
 
         }
-        return super.doHurtTarget(p_21372_);
+        return super.doHurtTarget(serverLevel, p_21372_);
     }
 
     @Override
-    public boolean hurt(DamageSource p_21016_, float p_21017_) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource p_21016_, float p_21017_) {
 
 
         if (this.isDamageSourceBlockedBySpear(p_21016_)) {
@@ -208,7 +209,7 @@ public class Seeker extends AbstractSkeleton implements IGuardMob {
             }
         }
 
-        return super.hurt(p_21016_, p_21017_);
+        return super.hurtServer(serverLevel, p_21016_, p_21017_);
     }
 
     public boolean isDamageSourceBlockedBySpear(DamageSource p_21276_) {
@@ -235,8 +236,8 @@ public class Seeker extends AbstractSkeleton implements IGuardMob {
         return false;
     }
 
-    public static boolean checkStraySpawnRules(EntityType<Seeker> p_219121_, ServerLevelAccessor p_219122_, MobSpawnType p_219123_, BlockPos p_219124_, RandomSource p_219125_) {
-        return checkMonsterSpawnRules(p_219121_, p_219122_, p_219123_, p_219124_, p_219125_) && (p_219123_ == MobSpawnType.SPAWNER || p_219122_.canSeeSky(p_219124_));
+    public static boolean checkStraySpawnRules(EntityType<Seeker> p_219121_, ServerLevelAccessor p_219122_, EntitySpawnReason p_219123_, BlockPos p_219124_, RandomSource p_219125_) {
+        return checkMonsterSpawnRules(p_219121_, p_219122_, p_219123_, p_219124_, p_219125_) && (p_219123_ == EntitySpawnReason.SPAWNER || p_219122_.canSeeSky(p_219124_));
     }
 
     protected SoundEvent getAmbientSound() {

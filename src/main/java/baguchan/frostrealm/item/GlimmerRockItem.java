@@ -11,14 +11,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ public class GlimmerRockItem extends Item {
 		}
 	}
 
-	public InteractionResultHolder<ItemStack> use(Level p_42927_, Player p_42928_, InteractionHand p_42929_) {
+	public InteractionResult use(Level p_42927_, Player p_42928_, InteractionHand p_42929_) {
 		return ItemUtils.startUsingInstantly(p_42927_, p_42928_, p_42929_);
 	}
 
@@ -59,12 +59,11 @@ public class GlimmerRockItem extends Item {
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack p_41452_) {
-		return UseAnim.CUSTOM;
+	public ItemUseAnimation getUseAnimation(ItemStack p_41452_) {
+		return ItemUseAnimation.DRINK;
 	}
 
-
-    public static final class ItemRender implements IClientItemExtensions {
+	public static final class ItemRender implements IClientItemExtensions {
 		private static final ItemRender INSTANCE = new ItemRender();
 
 		@Override

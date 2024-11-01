@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -110,7 +111,7 @@ public class SnowPileQuailEggBlock extends Block {
 
 				for (int j = 0; j < p_221194_.getValue(EGGS); ++j) {
 					p_221182_.levelEvent(2001, p_221183_, Block.getId(p_221194_));
-					SnowPileQuail snowpileEgg = FrostEntities.SNOWPILE_QUAIL.get().create(p_221182_);
+					SnowPileQuail snowpileEgg = FrostEntities.SNOWPILE_QUAIL.get().create(p_221182_, EntitySpawnReason.BREEDING);
 					snowpileEgg.setAge(-24000);
 					//snowpileEgg.setHomePos(p_221183_);
 					snowpileEgg.moveTo((double) p_221183_.getX() + 0.3D + (double) j * 0.2D, p_221183_.getY(), (double) p_221183_.getZ() + 0.3D, 0.0F, 0.0F);

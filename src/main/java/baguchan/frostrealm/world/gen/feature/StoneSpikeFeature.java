@@ -23,7 +23,7 @@ public class StoneSpikeFeature extends Feature<NoneFeatureConfiguration> {
         RandomSource randomsource = p_159882_.random();
         WorldGenLevel worldgenlevel = p_159882_.level();
 
-        while (worldgenlevel.isEmptyBlock(blockpos) && blockpos.getY() > worldgenlevel.getMinBuildHeight() + 2) {
+        while (worldgenlevel.isEmptyBlock(blockpos) && blockpos.getY() > worldgenlevel.getMinY() + 2) {
             blockpos = blockpos.below();
         }
 

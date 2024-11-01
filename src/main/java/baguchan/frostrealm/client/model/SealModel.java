@@ -4,17 +4,18 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.0.5
 
 
 import baguchan.frostrealm.client.animation.SealAnimations;
-import baguchan.frostrealm.entity.animal.Seal;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.SealRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class SealModel<T extends Seal> extends HierarchicalModel<T> {
+public class SealModel<T extends SealRenderState> extends EntityModel<T> {
     private final ModelPart root;
     private final ModelPart head;
 
     public SealModel(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.head = this.root.getChild("body").getChild("head");
     }
@@ -47,22 +48,17 @@ public class SealModel<T extends Seal> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F) * 0.9F;
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F) * 0.9F;
-        if (entity.isBaby()) {
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F) * 0.9F;
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F) * 0.9F;
+        if (entity.isBaby) {
             this.applyStatic(SealAnimations.BABY);
         }
-        if (entity.isInWater()) {
-            this.animateWalk(SealAnimations.SWIM, limbSwing, limbSwingAmount, 1.0F, 1.5F);
+        if (entity.isInWater) {
+            this.animateWalk(SealAnimations.SWIM, entity.walkAnimationPos, entity.walkAnimationSpeed, 1.0F, 1.5F);
         } else {
-            this.animateWalk(SealAnimations.WALK, limbSwing, limbSwingAmount, 1.0F, 4.0F);
+            this.animateWalk(SealAnimations.WALK, entity.walkAnimationPos, entity.walkAnimationSpeed, 1.0F, 4.0F);
         }
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.root;
     }
 }

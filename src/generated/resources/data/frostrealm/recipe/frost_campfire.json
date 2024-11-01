@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "F": {
-      "item": "frostrealm:frost_crystal"
-    },
-    "L": {
-      "tag": "minecraft:logs_that_burn"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+    "F": "frostrealm:frost_crystal",
+    "L": "#minecraft:logs_that_burn",
+    "S": "#c:rods/wooden"
   },
   "pattern": [
     " S ",

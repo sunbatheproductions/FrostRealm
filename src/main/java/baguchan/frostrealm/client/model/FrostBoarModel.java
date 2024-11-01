@@ -4,14 +4,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.7.2
 
 
 import baguchan.frostrealm.client.animation.FrostBoarAnimations;
-import baguchan.frostrealm.entity.animal.FrostBoar;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.FrostBoarRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class FrostBoarModel<T extends FrostBoar> extends HierarchicalModel<T> {
-    private final ModelPart realRoot;
+public class FrostBoarModel<T extends FrostBoarRenderState> extends EntityModel<T> {
     private final ModelPart root;
     private final ModelPart head;
     private final ModelPart leg_R;
@@ -21,7 +20,7 @@ public class FrostBoarModel<T extends FrostBoar> extends HierarchicalModel<T> {
     private final ModelPart body;
 
     public FrostBoarModel(ModelPart root) {
-        this.realRoot = root;
+        super(root);
         this.root = root.getChild("root");
         this.head = this.root.getChild("head");
         this.leg_R = this.root.getChild("leg_R");
@@ -60,18 +59,13 @@ public class FrostBoarModel<T extends FrostBoar> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F);
+        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-        this.animateWalk(FrostBoarAnimations.RUN, limbSwing, limbSwingAmount * (entity.getRunningScale()), 3.0F, 8.0F);
-        this.animateWalk(FrostBoarAnimations.WALK, limbSwing, limbSwingAmount * (1.0F - entity.getRunningScale()), 1.0F, 2.0F);
-        this.animate(entity.attackAnimation, FrostBoarAnimations.ATTACK, ageInTicks);
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.realRoot;
+        this.animateWalk(FrostBoarAnimations.RUN, entity.walkAnimationPos, entity.walkAnimationSpeed * (entity.runningScale), 3.0F, 8.0F);
+        this.animateWalk(FrostBoarAnimations.WALK, entity.walkAnimationPos, entity.walkAnimationSpeed * (1.0F - entity.runningScale), 1.0F, 2.0F);
+        this.animate(entity.attackAnimation, FrostBoarAnimations.ATTACK, entity.ageInTicks);
     }
 }

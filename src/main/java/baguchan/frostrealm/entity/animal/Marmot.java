@@ -1,10 +1,10 @@
 package baguchan.frostrealm.entity.animal;
 
-import bagu_chan.bagus_lib.entity.goal.TimeConditionGoal;
 import baguchan.frostrealm.entity.goal.SeekShelterEvenBlizzardGoal;
 import baguchan.frostrealm.entity.path.FrostPathNavigation;
 import baguchan.frostrealm.registry.FrostEntities;
 import baguchan.frostrealm.registry.FrostSounds;
+import baguchi.bagus_lib.entity.goal.TimeConditionGoal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,7 +21,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -30,7 +29,6 @@ import java.util.EnumSet;
 public class Marmot extends FrostAnimal {
 	private static final EntityDimensions BABY_DIMENSIONS = FrostEntities.MARMOT.get().getDimensions().scale(0.5F).withEyeHeight(0.2F);
 
-	public static final Ingredient FOOD_ITEMS = Ingredient.of(ItemTags.SMALL_FLOWERS);
 	private static final UniformInt TIME_BETWEEN_STANDS = UniformInt.of(300, 600);
 	private static final UniformInt TIME_BETWEEN_STANDS_COOLDOWN = UniformInt.of(600, 1200);
 
@@ -60,7 +58,7 @@ public class Marmot extends FrostAnimal {
 
 	@Override
 	public boolean isFood(ItemStack p_27600_) {
-		return FOOD_ITEMS.test(p_27600_);
+		return p_27600_.is(ItemTags.SMALL_FLOWERS);
 	}
 
 	@Override
@@ -102,7 +100,7 @@ public class Marmot extends FrostAnimal {
 	@Nullable
 	@Override
 	public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-		return FrostEntities.MARMOT.get().create(p_146743_);
+		return FrostEntities.MARMOT.get().create(p_146743_, EntitySpawnReason.BREEDING);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {

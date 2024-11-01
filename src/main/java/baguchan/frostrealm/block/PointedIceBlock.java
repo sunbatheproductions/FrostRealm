@@ -26,7 +26,10 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DripstoneThickness;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -43,7 +46,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class PointedIceBlock extends Block implements Fallable, SimpleWaterloggedBlock {
-	public static final DirectionProperty TIP_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
+    public static final EnumProperty<Direction> TIP_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
 	public static final EnumProperty<DripstoneThickness> THICKNESS = BlockStateProperties.DRIPSTONE_THICKNESS;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	private static final VoxelShape TIP_MERGE_SHAPE = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 16.0D, 11.0D);
@@ -94,14 +97,18 @@ public class PointedIceBlock extends Block implements Fallable, SimpleWaterlogge
 		}
 	}
 
-	public void onProjectileHit(Level p_154042_, BlockState p_154043_, BlockHitResult p_154044_, Projectile p_154045_) {
-		BlockPos blockpos = p_154044_.getBlockPos();
-		if (!p_154042_.isClientSide && p_154045_.mayInteract(p_154042_, blockpos) && p_154045_ instanceof ThrownTrident && p_154045_.getDeltaMovement().length() > 0.6D) {
-			p_154042_.destroyBlock(blockpos, true);
-		}
-
+    @Override
+    protected void onProjectileHit(Level p_60453_, BlockState p_60454_, BlockHitResult p_60455_, Projectile p_60456_) {
+        super.onProjectileHit(p_60453_, p_60454_, p_60455_, p_60456_);
+        BlockPos blockpos = p_60455_.getBlockPos();
+        if (p_60453_ instanceof ServerLevel serverLevel) {
+            if (!p_60453_.isClientSide && p_60456_.mayInteract(serverLevel, blockpos) && p_60456_ instanceof ThrownTrident && p_60456_.getDeltaMovement().length() > 0.6D) {
+                p_60453_.destroyBlock(blockpos, true);
+            }
+        }
 	}
 
+    @Override
 	public void fallOn(Level p_154047_, BlockState p_154048_, BlockPos p_154049_, Entity p_154050_, float p_154051_) {
 		if (p_154048_.getValue(TIP_DIRECTION) == Direction.UP && p_154048_.getValue(THICKNESS) == DripstoneThickness.TIP) {
 			p_154050_.causeFallDamage(p_154051_ + 2.0F, 2.0F, p_154047_.damageSources().stalagmite());
@@ -167,6 +174,7 @@ public class PointedIceBlock extends Block implements Fallable, SimpleWaterlogge
 		return Shapes.empty();
 	}
 
+    @Override
 	public VoxelShape getShape(BlockState p_154117_, BlockGetter p_154118_, BlockPos p_154119_, CollisionContext p_154120_) {
 		DripstoneThickness dripstonethickness = p_154117_.getValue(THICKNESS);
 		VoxelShape voxelshape;
@@ -186,7 +194,7 @@ public class PointedIceBlock extends Block implements Fallable, SimpleWaterlogge
 			voxelshape = BASE_SHAPE;
 		}
 
-		Vec3 vec3 = p_154117_.getOffset(p_154118_, p_154119_);
+        Vec3 vec3 = p_154117_.getOffset(p_154119_);
 		return voxelshape.move(vec3.x, 0.0D, vec3.z);
 	}
 
@@ -328,7 +336,7 @@ public class PointedIceBlock extends Block implements Fallable, SimpleWaterlogge
 	}
 
 	private static void spawnDripParticle(Level p_154072_, BlockPos p_154073_, BlockState p_154074_, Fluid p_154075_) {
-		Vec3 vec3 = p_154074_.getOffset(p_154072_, p_154073_);
+        Vec3 vec3 = p_154074_.getOffset(p_154073_);
 		double d0 = 0.0625D;
 		double d1 = (double) p_154073_.getX() + 0.5D + vec3.x;
 		double d2 = (double) ((float) (p_154073_.getY() + 1) - 0.6875F) - 0.0625D;

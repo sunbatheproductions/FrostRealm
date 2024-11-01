@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:snowball"
-    },
-    "S": {
-      "item": "frostrealm:stray_necklace_part"
-    }
+    "B": "minecraft:snowball",
+    "S": "frostrealm:stray_necklace_part"
   },
   "pattern": [
     " S ",

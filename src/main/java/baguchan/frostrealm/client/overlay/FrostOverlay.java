@@ -10,7 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
@@ -38,7 +39,7 @@ public class FrostOverlay implements LayeredDraw.Layer {
                 this.random.setSeed((this.tickCount * 312871));
                 RenderSystem.enableBlend();
                 FrostLivingCapability cap = entity.getData(FrostAttachs.FROST_LIVING);
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShader(CoreShaders.POSITION_TEX_COLOR);
                 int l = cap.getTemperatureLevel();
                 int j1 = screenWidth / 2 + 91;
                 int k1 = screenHeight;
@@ -50,12 +51,12 @@ public class FrostOverlay implements LayeredDraw.Layer {
                         i7 = k1 + this.random.nextInt(3) - 1;
                     }
                     int k8 = j1 - k6 * 8 - 9;
-                    guiGraphics.blitSprite(ICON_2, k8, i7, 9, 9);
+                    guiGraphics.blitSprite(RenderType::guiTextured, ICON_2, k8, i7, 9, 9);
                     if (k6 * 2 + 1 < l) {
-                        guiGraphics.blitSprite(ICON_0, k8, i7, 9, 9);
+                        guiGraphics.blitSprite(RenderType::guiTextured, ICON_0, k8, i7, 9, 9);
                     }
                     if (k6 * 2 + 1 == l) {
-                        guiGraphics.blitSprite(ICON_1, k8, i7, 9, 9);
+                        guiGraphics.blitSprite(RenderType::guiTextured, ICON_1, k8, i7, 9, 9);
                     }
                 }
                 RenderSystem.disableBlend();

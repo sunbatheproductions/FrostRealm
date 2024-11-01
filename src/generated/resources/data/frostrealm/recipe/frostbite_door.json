@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "D": {
-      "item": "frostrealm:frostbite_planks"
-    }
+    "D": "frostrealm:frostbite_planks"
   },
   "pattern": [
     "DD",

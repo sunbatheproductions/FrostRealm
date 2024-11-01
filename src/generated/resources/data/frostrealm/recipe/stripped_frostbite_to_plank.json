@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "frostrealm:stripped_frostbite_log"
-    }
+    "frostrealm:stripped_frostbite_log"
   ],
   "result": {
     "count": 4,

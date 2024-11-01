@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.TriState;
 
 public class FrostRenderType extends RenderType {
 
@@ -16,7 +17,7 @@ public class FrostRenderType extends RenderType {
             1536,
             RenderType.CompositeState.builder()
                     .setShaderState(RENDERTYPE_GLINT_TRANSLUCENT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), true, false))
+                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), TriState.TRUE, false))
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(RenderStateShard.GREATER_DEPTH_TEST)
@@ -32,7 +33,7 @@ public class FrostRenderType extends RenderType {
             1536,
             RenderType.CompositeState.builder()
                     .setShaderState(RENDERTYPE_GLINT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), true, false))
+                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), TriState.TRUE, false))
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(RenderStateShard.GREATER_DEPTH_TEST)
@@ -47,7 +48,7 @@ public class FrostRenderType extends RenderType {
             1536,
             RenderType.CompositeState.builder()
                     .setShaderState(RENDERTYPE_ENTITY_GLINT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), true, false))
+                    .setTextureState(new RenderStateShard.TextureStateShard(ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/environment/aurora.png"), TriState.TRUE, false))
                     .setWriteMaskState(COLOR_WRITE)
                     .setCullState(NO_CULL)
                     .setDepthTestState(RenderStateShard.GREATER_DEPTH_TEST)

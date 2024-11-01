@@ -3,9 +3,7 @@
   "category": "food",
   "cookingtime": 600,
   "experience": 0.15,
-  "ingredient": {
-    "item": "frostrealm:frost_boar_meat"
-  },
+  "ingredient": "frostrealm:frost_boar_meat",
   "result": {
     "count": 1,
     "id": "frostrealm:cooked_frost_boar_meat"

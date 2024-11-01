@@ -16,10 +16,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Portal;
@@ -29,7 +26,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.PortalShape;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -71,14 +69,24 @@ public class FrostPortalBlock extends Block implements Portal {
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState p_54928_, Direction p_54929_, BlockState p_54930_, LevelAccessor p_54931_, BlockPos p_54932_, BlockPos p_54933_) {
+	protected BlockState updateShape(
+			BlockState p_54928_,
+			LevelReader p_374413_,
+			ScheduledTickAccess p_374339_,
+			BlockPos p_54932_,
+			Direction p_54929_,
+			BlockPos p_54933_,
+			BlockState p_54930_,
+			RandomSource p_374242_
+	) {
 		Direction.Axis direction$axis = p_54929_.getAxis();
 		Direction.Axis direction$axis1 = p_54928_.getValue(AXIS);
 		boolean flag = direction$axis1 != direction$axis && direction$axis.isHorizontal();
-		return !flag && !p_54930_.is(this) && !new FrostPortalShape(p_54931_, p_54932_, direction$axis1).isComplete()
+		return !flag && !p_54930_.is(this) && !PortalShape.findAnyShape(p_374413_, p_54932_, direction$axis1).isComplete()
 				? Blocks.AIR.defaultBlockState()
-				: super.updateShape(p_54928_, p_54929_, p_54930_, p_54931_, p_54932_, p_54933_);
+				: super.updateShape(p_54928_, p_374413_, p_374339_, p_54932_, p_54929_, p_54933_, p_54930_, p_374242_);
 	}
+
 
 
 	@Override
@@ -142,7 +150,7 @@ public class FrostPortalBlock extends Block implements Portal {
 
 	@javax.annotation.Nullable
 	@Override
-	public DimensionTransition getPortalDestination(ServerLevel p_350444_, Entity p_350334_, BlockPos p_350764_) {
+	public TeleportTransition getPortalDestination(ServerLevel p_350444_, Entity p_350334_, BlockPos p_350764_) {
 		ResourceKey<Level> resourcekey = p_350444_.dimension() == FrostDimensions.FROSTREALM_LEVEL ? Level.OVERWORLD : FrostDimensions.FROSTREALM_LEVEL;
 		ServerLevel serverlevel = p_350444_.getServer().getLevel(resourcekey);
 		if (serverlevel == null) {
@@ -157,12 +165,12 @@ public class FrostPortalBlock extends Block implements Portal {
 	}
 
 	@javax.annotation.Nullable
-	private DimensionTransition getExitPortal(
+	private TeleportTransition getExitPortal(
 			ServerLevel p_350564_, Entity p_350493_, BlockPos p_350379_, BlockPos p_350747_, boolean p_350326_, WorldBorder p_350718_
 	) {
 		Optional<BlockPos> optional = new FrostPortalForcer(p_350564_).findClosestPortalPosition(p_350747_, p_350326_, p_350718_);
 		BlockUtil.FoundRectangle blockutil$foundrectangle;
-		DimensionTransition.PostDimensionTransition dimensiontransition$postdimensiontransition;
+		TeleportTransition.PostTeleportTransition dimensiontransition$postdimensiontransition;
 		if (optional.isPresent()) {
 			BlockPos blockpos = optional.get();
 			BlockState blockstate = p_350564_.getBlockState(blockpos);
@@ -174,20 +182,20 @@ public class FrostPortalBlock extends Block implements Portal {
 					21,
 					p_351970_ -> p_350564_.getBlockState(p_351970_) == blockstate
 			);
-			dimensiontransition$postdimensiontransition = DimensionTransition.PLAY_PORTAL_SOUND.then(p_351967_ -> p_351967_.placePortalTicket(blockpos));
+			dimensiontransition$postdimensiontransition = TeleportTransition.PLAY_PORTAL_SOUND.then(p_351967_ -> p_351967_.placePortalTicket(blockpos));
 		} else {
 			Direction.Axis direction$axis = p_350493_.level().getBlockState(p_350379_).getOptionalValue(AXIS).orElse(Direction.Axis.X);
 			Optional<BlockUtil.FoundRectangle> optional1 = new FrostPortalForcer(p_350564_).createPortal(p_350747_, direction$axis);
 
 			blockutil$foundrectangle = optional1.get();
-			dimensiontransition$postdimensiontransition = DimensionTransition.PLAY_PORTAL_SOUND.then(DimensionTransition.PLACE_PORTAL_TICKET);
+			dimensiontransition$postdimensiontransition = TeleportTransition.PLAY_PORTAL_SOUND.then(TeleportTransition.PLACE_PORTAL_TICKET);
 		}
 
 		return getDimensionTransitionFromExit(p_350493_, p_350379_, blockutil$foundrectangle, p_350564_, dimensiontransition$postdimensiontransition);
 	}
 
-	private static DimensionTransition getDimensionTransitionFromExit(
-			Entity p_350906_, BlockPos p_350376_, BlockUtil.FoundRectangle p_350428_, ServerLevel p_350928_, DimensionTransition.PostDimensionTransition p_352093_
+	private static TeleportTransition getDimensionTransitionFromExit(
+			Entity p_350906_, BlockPos p_350376_, BlockUtil.FoundRectangle p_350428_, ServerLevel p_350928_, TeleportTransition.PostTeleportTransition p_352093_
 	) {
 		BlockState blockstate = p_350906_.level().getBlockState(p_350376_);
 		Direction.Axis direction$axis;
@@ -207,7 +215,7 @@ public class FrostPortalBlock extends Block implements Portal {
 		);
 	}
 
-	private static DimensionTransition createDimensionTransition(
+	private static TeleportTransition createDimensionTransition(
 			ServerLevel p_350955_,
 			BlockUtil.FoundRectangle p_350865_,
 			Direction.Axis p_351013_,
@@ -216,7 +224,7 @@ public class FrostPortalBlock extends Block implements Portal {
 			Vec3 p_350266_,
 			float p_350648_,
 			float p_350338_,
-			DimensionTransition.PostDimensionTransition p_352441_
+			TeleportTransition.PostTeleportTransition p_352441_
 	) {
 		BlockPos blockpos = p_350865_.minCorner;
 		BlockState blockstate = p_350955_.getBlockState(blockpos);
@@ -232,6 +240,6 @@ public class FrostPortalBlock extends Block implements Portal {
 		boolean flag = direction$axis == Direction.Axis.X;
 		Vec3 vec31 = new Vec3((double) blockpos.getX() + (flag ? d2 : d4), (double) blockpos.getY() + d3, (double) blockpos.getZ() + (flag ? d4 : d2));
 		Vec3 vec32 = FrostPortalShape.findCollisionFreePosition(vec31, p_350955_, p_350578_, entitydimensions);
-		return new DimensionTransition(p_350955_, vec32, vec3, p_350648_ + (float) i, p_350338_, p_352441_);
+		return new TeleportTransition(p_350955_, vec32, vec3, p_350648_ + (float) i, p_350338_, p_352441_);
 	}
 }

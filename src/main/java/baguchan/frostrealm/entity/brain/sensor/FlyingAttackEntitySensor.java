@@ -28,21 +28,11 @@ public class FlyingAttackEntitySensor extends NearestLivingEntitySensor<Mob> {
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(EntitySelector.NO_CREATIVE_OR_SPECTATOR)
-                .filter(p_312759_ -> Sensor.isEntityAttackable(p_312739_, p_312759_))
+                .filter(p_312759_ -> Sensor.isEntityAttackable(p_312447_, p_312739_, p_312759_))
                 .findFirst()
                 .ifPresentOrElse(
                         p_312872_ -> p_312739_.getBrain().setMemory(MemoryModuleType.NEAREST_ATTACKABLE, p_312872_),
                         () -> p_312739_.getBrain().eraseMemory(MemoryModuleType.NEAREST_ATTACKABLE)
                 );
-    }
-
-    @Override
-    protected int radiusXZ() {
-        return 24;
-    }
-
-    @Override
-    protected int radiusY() {
-        return 32;
     }
 }

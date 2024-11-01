@@ -1,15 +1,16 @@
 package baguchan.frostrealm.entity.hostile;
 
-import bagu_chan.bagus_lib.client.camera.CameraCore;
-import bagu_chan.bagus_lib.client.camera.holder.CameraHolder;
-import bagu_chan.bagus_lib.util.GlobalVec3;
 import baguchan.frostrealm.entity.goal.RollGoal;
 import baguchan.frostrealm.registry.FrostTags;
+import baguchi.bagus_lib.client.camera.CameraCore;
+import baguchi.bagus_lib.client.camera.holder.CameraHolder;
+import baguchi.bagus_lib.util.GlobalVec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -179,9 +180,11 @@ public class Gokkur extends Monster {
             double d2 = this.getZ() - livingentity.getZ();
             double d3 = livingentity.getX() - this.getX();
             double d4 = livingentity.getZ() - this.getZ();
-            if (livingentity.hurt(this.damageSources().mobAttack(this), Mth.floor(getAttackDamage() * 1.5F + this.getSnowProgress()))) {
-                this.playSound(SoundEvents.PLAYER_ATTACK_KNOCKBACK, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-                livingentity.knockback(f2 * f1, d1, d2);
+            if (this.level() instanceof ServerLevel serverLevel) {
+                if (livingentity.hurtServer(serverLevel, this.damageSources().mobAttack(this), Mth.floor(getAttackDamage() * 1.5F + this.getSnowProgress()))) {
+                    this.playSound(SoundEvents.PLAYER_ATTACK_KNOCKBACK, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+                    livingentity.knockback(f2 * f1, d1, d2);
+                }
             }
         }
     }
@@ -227,7 +230,7 @@ public class Gokkur extends Monster {
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance p_21435_, MobSpawnType p_21436_, @Nullable SpawnGroupData p_21437_) {
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance p_21435_, EntitySpawnReason p_21436_, @Nullable SpawnGroupData p_21437_) {
         if (serverLevelAccessor.getBiome(this.blockPosition()).is(FrostTags.Biomes.GRASS_FROST_BIOME)) {
             this.setGrass(true);
         }

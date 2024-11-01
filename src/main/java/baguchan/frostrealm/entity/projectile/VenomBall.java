@@ -27,8 +27,9 @@ public class VenomBall extends ThrowableProjectile {
         super(p_37456_, p_37457_, p_37458_, p_37459_, p_37460_);
     }
 
-    public VenomBall(EntityType<? extends ThrowableProjectile> p_37462_, LivingEntity p_37463_, Level p_37464_) {
-        super(p_37462_, p_37463_, p_37464_);
+    public VenomBall(EntityType<? extends VenomBall> p_37438_, LivingEntity p_37439_, Level p_37440_) {
+        this(p_37438_, p_37439_.getX(), p_37439_.getEyeY() - 0.1F, p_37439_.getZ(), p_37440_);
+        this.setOwner(p_37439_);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class VenomBall extends ThrowableProjectile {
     @Override
     protected void onHitEntity(EntityHitResult p_326121_) {
         super.onHitEntity(p_326121_);
-        if (!this.level().isClientSide) {
+        if (this.level() instanceof ServerLevel serverLevel) {
             LivingEntity livingentity = this.getOwner() instanceof LivingEntity livingentity1 ? livingentity1 : null;
             Entity entity = p_326121_.getEntity();
             if (livingentity != null) {
@@ -92,7 +93,7 @@ public class VenomBall extends ThrowableProjectile {
 
             int poison = this.level().getDifficulty().getId();
             DamageSource damagesource = this.damageSources().source(FrostDamageType.VENOM_BALL, this, livingentity);
-            if (entity.hurt(damagesource, 2.0F) && entity instanceof LivingEntity livingentity2) {
+            if (entity.hurtServer(serverLevel, damagesource, 2.0F) && entity instanceof LivingEntity livingentity2) {
                 EnchantmentHelper.doPostAttackEffects((ServerLevel) this.level(), livingentity2, damagesource);
                 livingentity2.addEffect(new MobEffectInstance(MobEffects.POISON, 40 + 20 * poison));
             }

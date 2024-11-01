@@ -1,9 +1,5 @@
 package baguchan.frostrealm.client;
 
-import bagu_chan.bagus_lib.animation.BaguAnimationController;
-import bagu_chan.bagus_lib.api.client.IRootModel;
-import bagu_chan.bagus_lib.client.event.BagusModelEvent;
-import bagu_chan.bagus_lib.util.client.AnimationUtil;
 import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.api.recipe.AttachableCrystal;
 import baguchan.frostrealm.client.animation.SpearAttackAnimations;
@@ -12,14 +8,13 @@ import baguchan.frostrealm.registry.FrostAnimations;
 import baguchan.frostrealm.registry.FrostDataCompnents;
 import baguchan.frostrealm.registry.FrostItems;
 import baguchan.frostrealm.utils.aurorapower.AuroraPowerUtils;
+import baguchi.bagus_lib.animation.BaguAnimationController;
+import baguchi.bagus_lib.client.event.BagusModelEvent;
 import net.minecraft.Util;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -56,44 +51,33 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void animationEvent(BagusModelEvent.Init bagusModelEvent) {
-        IRootModel rootModel = bagusModelEvent.getRootModel();
-        if (bagusModelEvent.isSupportedAnimateModel()) {
-            rootModel.getBagusRoot().getAllParts().forEach(ModelPart::resetPose);
-        }
-    }
-
-    @SubscribeEvent
     public static void animationEvent(BagusModelEvent.PostAnimate bagusModelEvent) {
-        IRootModel rootModel = bagusModelEvent.getRootModel();
-        BaguAnimationController animationController = AnimationUtil.getAnimationController(bagusModelEvent.getEntity());
-        if (bagusModelEvent.isSupportedAnimateModel() && animationController != null && bagusModelEvent.getEntity() instanceof Player livingEntity) {
-            if (livingEntity.getItemBySlot(EquipmentSlot.MAINHAND).is(FrostItems.FROST_SPEAR.get())) {
-                if (livingEntity.getMainArm() == HumanoidArm.RIGHT) {
-                    rootModel.getBagusRoot().getChild("right_arm").resetPose();
-                    rootModel.getBagusRoot().getChild("left_arm").resetPose();
-                    rootModel.applyStaticBagu(SpearAttackAnimations.idle_right);
+        BaguAnimationController animationController = bagusModelEvent.getBaguAnimationController();
+        if (bagusModelEvent.getEntityRenderState().getMainHandItem().is(FrostItems.FROST_SPEAR.get())) {
+            if (bagusModelEvent.getEntityRenderState().mainArm == HumanoidArm.RIGHT) {
+                bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get().resetPose();
+                bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get().resetPose();
+                bagusModelEvent.applyStatic(SpearAttackAnimations.idle_right);
                     if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
-                        rootModel.animateBagu(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_right, bagusModelEvent.getAgeInTick(), 2.0F);
+                        bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_right, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
                     } else {
-                        rootModel.applyStaticBagu(SpearAttackAnimations.idle_right);
+                        bagusModelEvent.applyStatic(SpearAttackAnimations.idle_right);
                     }
-                    if (bagusModelEvent.getModel() instanceof PlayerModel<?>) {
-                        rootModel.getBagusRoot().getChild("right_sleeve").copyFrom(rootModel.getBagusRoot().getChild("right_arm"));
-                        rootModel.getBagusRoot().getChild("left_sleeve").copyFrom(rootModel.getBagusRoot().getChild("left_arm"));
+                if (bagusModelEvent.getModel() instanceof PlayerModel) {
+                    bagusModelEvent.getModel().getAnyDescendantWithName("right_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get());
+                    bagusModelEvent.getModel().getAnyDescendantWithName("left_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get());
                     }
                 } else {
-                    rootModel.getBagusRoot().getChild("right_arm").resetPose();
-                    rootModel.getBagusRoot().getChild("left_arm").resetPose();
+                bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get().resetPose();
+                bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get().resetPose();
                     if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
-                        rootModel.animateBagu(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_left, bagusModelEvent.getAgeInTick(), 2.0F);
+                        bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_left, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
                     } else {
-                        rootModel.applyStaticBagu(SpearAttackAnimations.idle_left);
+                        bagusModelEvent.applyStatic(SpearAttackAnimations.idle_left);
                     }
-                    if (bagusModelEvent.getModel() instanceof PlayerModel<?>) {
-                        rootModel.getBagusRoot().getChild("right_sleeve").copyFrom(rootModel.getBagusRoot().getChild("right_arm"));
-                        rootModel.getBagusRoot().getChild("left_sleeve").copyFrom(rootModel.getBagusRoot().getChild("left_arm"));
-                    }
+                if (bagusModelEvent.getModel() instanceof PlayerModel) {
+                    bagusModelEvent.getModel().getAnyDescendantWithName("right_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get());
+                    bagusModelEvent.getModel().getAnyDescendantWithName("left_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get());
                 }
             }
         }

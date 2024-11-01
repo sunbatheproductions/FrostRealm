@@ -5,6 +5,7 @@ import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.CorruptedWalkerFootModel;
 import baguchan.frostrealm.client.model.CorruptedWalkerModel;
 import baguchan.frostrealm.client.model.CorruptedWalkerPartModel;
+import baguchan.frostrealm.client.render.state.CorruptedWalkerRenderState;
 import baguchan.frostrealm.entity.hostile.part.CorruptedWalker;
 import baguchan.frostrealm.entity.hostile.part.CorruptedWalkerPart;
 import baguchan.frostrealm.entity.hostile.part.CorruptedWalkerPartContainer;
@@ -21,7 +22,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 
-public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, CorruptedWalkerModel<CorruptedWalker>> {
+import java.util.Arrays;
+
+public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, CorruptedWalkerRenderState, CorruptedWalkerModel<CorruptedWalkerRenderState>> {
     private static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/corrupted_walker/corrupted_walker.png");
     private static final ResourceLocation EYE_LOCATION = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/corrupted_walker/corrupted_walker_eye.png");
     private static final ResourceLocation FOOT_LOCATION = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/corrupted_walker/corrupted_walker_foot.png");
@@ -43,18 +46,29 @@ public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, Corrup
     }
 
     @Override
-    public void render(CorruptedWalker entity, float p_115309_, float particalTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {
-        super.render(entity, p_115309_, particalTick, poseStack, multiBufferSource, light);
-        for (CorruptedWalkerPartContainer container : entity.ec) {
+    public void render(CorruptedWalkerRenderState entity, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {
+        super.render(entity, poseStack, multiBufferSource, light);
+        for (CorruptedWalkerPartContainer container : entity.container) {
             for (CorruptedWalkerPart part : container.getParts()) {
-                renderMultiPart(part, poseStack, particalTick, multiBufferSource, light);
+                renderMultiPart(entity, part, poseStack, entity.partialTick, multiBufferSource, light);
             }
 
-            renderFootMultiPart(container.getParentPart(), poseStack, particalTick, multiBufferSource, light);
+            renderFootMultiPart(entity, container.getParentPart(), poseStack, entity.partialTick, multiBufferSource, light);
         }
     }
 
-    public void renderMultiPart(CorruptedWalkerPart entity, PoseStack poseStack, float partialTick, MultiBufferSource multiBufferSource, int light) {
+    @Override
+    public void extractRenderState(CorruptedWalker p_362733_, CorruptedWalkerRenderState p_360515_, float p_361157_) {
+        super.extractRenderState(p_362733_, p_360515_, p_361157_);
+        p_360515_.container = Arrays.stream(p_362733_.ec).toList();
+    }
+
+    @Override
+    public CorruptedWalkerRenderState createRenderState() {
+        return new CorruptedWalkerRenderState();
+    }
+
+    public void renderMultiPart(CorruptedWalkerRenderState state, CorruptedWalkerPart entity, PoseStack poseStack, float partialTick, MultiBufferSource multiBufferSource, int light) {
         poseStack.pushPose();
         double x = Mth.lerp(partialTick, entity.parentMob.xo - entity.xo, entity.parentMob.getX() - entity.getX());
         double y = Mth.lerp(partialTick, entity.parentMob.yo - entity.yo, entity.parentMob.getY() - entity.getY());
@@ -65,27 +79,27 @@ public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, Corrup
         poseStack.translate(-x, -y, -z);
 
         poseStack.scale(f8, f8, f8);
-        this.setupPartRotations(entity, poseStack, this.getBob(entity.parentMob, partialTick), f, partialTick, f8);
+        this.setupPartRotations(state, entity, poseStack, 0.0F, f, partialTick, f8);
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
 
-        this.scale(entity.parentMob, poseStack, partialTick);
+        this.scale(state, poseStack);
         poseStack.translate(0.0F, -1.501F, 0.0F);
 
-        boolean flag = this.isBodyVisible(entity.parentMob);
+        boolean flag = this.isBodyVisible(state);
         Minecraft minecraft = Minecraft.getInstance();
         boolean flag1 = !flag && !entity.isInvisibleTo(minecraft.player);
         boolean flag2 = minecraft.shouldEntityAppearGlowing(entity);
         RenderType rendertype = this.partModel.renderType(PART_LOCATION);
         if (rendertype != null) {
             VertexConsumer vertexconsumer = multiBufferSource.getBuffer(rendertype);
-            int i = getOverlayCoords(entity.parentMob, 0.0F);
+            int i = getOverlayCoords(state, 0.0F);
             this.partModel.renderToBuffer(poseStack, vertexconsumer, light, i, flag1 ? 654311423 : -1);
         }
         poseStack.popPose();
     }
 
-    public void renderFootMultiPart(CorruptedWalkerPart entity, PoseStack poseStack, float partialTick, MultiBufferSource multiBufferSource, int light) {
+    public void renderFootMultiPart(CorruptedWalkerRenderState state, CorruptedWalkerPart entity, PoseStack poseStack, float partialTick, MultiBufferSource multiBufferSource, int light) {
         poseStack.pushPose();
         double x = Mth.lerp(partialTick, entity.parentMob.xo - entity.xo, entity.parentMob.getX() - entity.getX());
         double y = Mth.lerp(partialTick, entity.parentMob.yo - entity.yo, entity.parentMob.getY() - entity.getY());
@@ -96,27 +110,27 @@ public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, Corrup
         poseStack.translate(-x, -y, -z);
 
         poseStack.scale(f8, f8, f8);
-        this.setupPartRotations(entity, poseStack, this.getBob(entity.parentMob, partialTick), f, partialTick, f8);
+        this.setupPartRotations(state, entity, poseStack, 0.0F, f, partialTick, f8);
 
         poseStack.scale(-1.0F, -1.0F, 1.0F);
-        this.scale(entity.parentMob, poseStack, partialTick);
+        this.scale(state, poseStack);
         poseStack.translate(0.0F, -1.501F, 0.0F);
 
-        boolean flag = this.isBodyVisible(entity.parentMob);
+        boolean flag = this.isBodyVisible(state);
         Minecraft minecraft = Minecraft.getInstance();
         boolean flag1 = !flag && !entity.isInvisibleTo(minecraft.player);
         boolean flag2 = minecraft.shouldEntityAppearGlowing(entity);
         RenderType rendertype = this.footModel.renderType(FOOT_LOCATION);
         if (rendertype != null) {
             VertexConsumer vertexconsumer = multiBufferSource.getBuffer(rendertype);
-            int i = getOverlayCoords(entity.parentMob, 0.0F);
+            int i = getOverlayCoords(state, 0.0F);
             this.footModel.renderToBuffer(poseStack, vertexconsumer, light, i, flag1 ? 654311423 : -1);
         }
         poseStack.popPose();
     }
 
-    protected void setupPartRotations(CorruptedWalkerPart p_115317_, PoseStack p_115318_, float p_115319_, float p_115320_, float p_115321_, float p_320045_) {
-        if (this.isShaking(p_115317_.parentMob)) {
+    protected void setupPartRotations(CorruptedWalkerRenderState state, CorruptedWalkerPart p_115317_, PoseStack p_115318_, float p_115319_, float p_115320_, float p_115321_, float p_320045_) {
+        if (this.isShaking(state)) {
             p_115320_ += (float) (Math.cos((double) p_115317_.tickCount * 3.25) * Math.PI * 0.4F);
         }
 
@@ -148,7 +162,7 @@ public class CorruptedWalkerRenderer extends MobRenderer<CorruptedWalker, Corrup
     }
 
     @Override
-    public ResourceLocation getTextureLocation(CorruptedWalker corrupedWalker) {
+    public ResourceLocation getTextureLocation(CorruptedWalkerRenderState corrupedWalker) {
         return LOCATION;
     }
 }

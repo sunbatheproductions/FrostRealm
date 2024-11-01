@@ -111,7 +111,7 @@ public class CellingNodeEvaluator extends WalkNodeEvaluator {
     }
 
     private Node tryFindFirstGroundNodeBelow(int p_326892_, int p_326901_, int p_326809_) {
-        for (int i = p_326901_ - 1; i >= this.mob.level().getMinBuildHeight(); i--) {
+        for (int i = p_326901_ - 1; i >= this.mob.level().getMinY(); i--) {
             if (p_326901_ - i > this.mob.getMaxFallDistance()) {
                 return this.getBlockedNode(p_326892_, i, p_326809_);
             }
@@ -171,10 +171,10 @@ public class CellingNodeEvaluator extends WalkNodeEvaluator {
             BlockPos blockpos = new BlockPos(p_263032_, p_263066_, p_263105_);
 
             for (Direction direction : Direction.values()) {
-                if (!this.currentContext.getBlockState(blockpos.offset(direction.getNormal())).isAir()) {
+                if (!this.currentContext.getBlockState(blockpos.offset(direction.getUnitVec3i())).isAir()) {
                     return node;
                 }
-                if (!this.currentContext.getBlockState(blockpos.offset(direction.getNormal()).below()).isAir()) {
+                if (!this.currentContext.getBlockState(blockpos.offset(direction.getUnitVec3i()).below()).isAir()) {
                     return node;
                 }
             }

@@ -3,6 +3,7 @@ package baguchan.frostrealm.client.render;
 import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.SealModel;
+import baguchan.frostrealm.client.render.state.SealRenderState;
 import baguchan.frostrealm.entity.animal.Seal;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -11,7 +12,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class SealRenderer<T extends Seal> extends MobRenderer<T, SealModel<T>> {
+public class SealRenderer<T extends Seal> extends MobRenderer<T, SealRenderState, SealModel<SealRenderState>> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/seal/seal.png");
     private static final ResourceLocation TEXTURE_BABY = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/seal/seal_baby.png");
 
@@ -23,10 +24,21 @@ public class SealRenderer<T extends Seal> extends MobRenderer<T, SealModel<T>> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(T p_110775_1_) {
+    public void extractRenderState(T p_362733_, SealRenderState p_360515_, float p_361157_) {
+        super.extractRenderState(p_362733_, p_360515_, p_361157_);
+        p_360515_.fartAnimationState.copyFrom(p_362733_.fartAnimationState);
+    }
+
+    @Override
+    public SealRenderState createRenderState() {
+        return new SealRenderState();
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(SealRenderState p_110775_1_) {
         if (p_110775_1_.fartAnimationState.isStarted()) {
-            return p_110775_1_.isBaby() ? TEXTURE_BABY_CLOSE_EYE : TEXTURE_CLOSE_EYE;
+            return p_110775_1_.isBaby ? TEXTURE_BABY_CLOSE_EYE : TEXTURE_CLOSE_EYE;
         }
-        return p_110775_1_.isBaby() ? TEXTURE_BABY : TEXTURE;
+        return p_110775_1_.isBaby ? TEXTURE_BABY : TEXTURE;
     }
 }

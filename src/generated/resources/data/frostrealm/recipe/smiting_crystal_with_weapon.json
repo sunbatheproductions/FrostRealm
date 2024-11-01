@@ -1,9 +1,5 @@
 {
   "type": "frostrealm:attach_crystal",
-  "addition": {
-    "item": "frostrealm:frost_crystal"
-  },
-  "base": {
-    "tag": "frostrealm:smithable_weapon"
-  }
+  "addition": "frostrealm:frost_crystal",
+  "base": "#frostrealm:smithable_weapon"
 }

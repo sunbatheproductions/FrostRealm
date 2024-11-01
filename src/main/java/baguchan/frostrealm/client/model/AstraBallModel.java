@@ -9,14 +9,16 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.Entity;
 
-public class AstraBallModel<T extends Entity> extends EntityModel<T> {
+public class AstraBallModel<T extends LivingEntityRenderState> extends EntityModel<T> {
     private final ModelPart root;
     private final ModelPart bone;
     private final ModelPart bone2;
 
     public AstraBallModel(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.bone = this.root.getChild("bone");
         this.bone2 = this.root.getChild("bone2");
@@ -36,18 +38,14 @@ public class AstraBallModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float f = ageInTicks * 0.65F;
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
+        float f = entity.ageInTicks * 0.65F;
 
 
         this.bone.yRot = f;
         this.bone2.yRot = f;
-        this.root.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.root.xRot = headPitch * ((float) Math.PI / 180F);
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+        this.root.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.root.xRot = entity.yRot * ((float) Math.PI / 180F);
     }
 }

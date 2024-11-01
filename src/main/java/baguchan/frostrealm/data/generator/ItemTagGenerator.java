@@ -74,6 +74,10 @@ public class ItemTagGenerator extends ItemTagsProvider {
         this.tag(FrostTags.Items.SMITHABLE_WEAPON).addTag(ItemTags.SWORDS).addTag(ItemTags.AXES).addTag(FrostTags.Items.SICKLE);
         this.tag(ItemTags.DURABILITY_ENCHANTABLE).add(FrostItems.FROST_SPEAR.get()).addTag(FrostTags.Items.SICKLE);
         this.tag(ItemTags.SHARP_WEAPON_ENCHANTABLE).add(FrostItems.FROST_SPEAR.get()).addTag(FrostTags.Items.SICKLE);
+
+        this.tag(FrostTags.Items.ASTRIUM_TOOL_MATERIAL).add(FrostItems.ASTRIUM_SICKLE.get()).add(FrostItems.ASTRIUM_SWORD.get()).add(FrostItems.ASTRIUM_AXE.get()).add(FrostItems.ASTRIUM_SHOVEL.get()).add(FrostItems.ASTRIUM_HOE.get()).add(FrostItems.ASTRIUM_PICKAXE.get())
+                .add(FrostItems.ASTRIUM_HELMET.get()).add(FrostItems.ASTRIUM_CHESTPLATE.get()).add(FrostItems.ASTRIUM_LEGGINGS.get()).add(FrostItems.ASTRIUM_BOOTS.get());
+
         this.tag(ItemTags.MEAT).add(FrostItems.COOKED_FROST_BOAR_MEAT.get()).add(FrostItems.COOKED_SNOWPILE_QUAIL_MEAT.get())
                 .add(FrostItems.FROST_BOAR_MEAT.get()).add(FrostItems.SNOWPILE_QUAIL_MEAT.get());
     }

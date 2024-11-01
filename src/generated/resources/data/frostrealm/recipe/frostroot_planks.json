@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "frostrealm:frostroot_log"
-    }
+    "frostrealm:frostroot_log"
   ],
   "result": {
     "count": 4,

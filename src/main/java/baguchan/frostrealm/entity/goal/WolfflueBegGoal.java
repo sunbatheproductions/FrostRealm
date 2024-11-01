@@ -31,7 +31,7 @@ public class WolfflueBegGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        this.player = this.level.getNearestPlayer(this.begTargeting, this.wolf);
+        this.player = this.level.getNearestPlayer(this.wolf, 8.0F);
         return this.player == null ? false : this.playerHoldingInteresting(this.player);
     }
 

@@ -3,9 +3,7 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.0.4
 // Paste this class into your mod and generate all required imports
 
 
-import baguchan.frostrealm.entity.hostile.FrostWraith;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import baguchan.frostrealm.client.render.state.FrostWraithRenderState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -13,7 +11,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
-public class FrostWraithModel<T extends FrostWraith> extends EntityModel<T> implements HeadedModel {
+public class FrostWraithModel<T extends FrostWraithRenderState> extends EntityModel<T> implements HeadedModel {
 	private final ModelPart head;
 	public final ModelPart body;
 	private final ModelPart arm_left;
@@ -26,6 +24,7 @@ public class FrostWraithModel<T extends FrostWraith> extends EntityModel<T> impl
 	public final ModelPart main;
 
 	public FrostWraithModel(ModelPart root) {
+		super(root);
 		this.main = root.getChild("main");
 		this.body = this.main.getChild("body");
 		this.head = this.body.getChild("head");
@@ -67,44 +66,40 @@ public class FrostWraithModel<T extends FrostWraith> extends EntityModel<T> impl
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-		main.render(poseStack, buffer, packedLight, packedOverlay, color);
-	}
+	public void setupAnim(T entity) {
+		super.setupAnim(entity);
+		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-		this.head.xRot = headPitch * ((float) Math.PI / 180F);
+		this.body.xRot = (float) ((Math.PI / 6F) * entity.walkAnimationSpeed);
 
-		this.body.xRot = (float) ((Math.PI / 6F) * limbSwingAmount);
+		this.arm_right.xRot = Mth.cos(entity.ageInTicks * 0.05F) * 0.2F;
+		this.arm_left.xRot = Mth.cos(entity.ageInTicks * 0.05F) * 0.2F;
 
-		this.arm_right.xRot = Mth.cos(ageInTicks * 0.05F) * 0.2F;
-		this.arm_left.xRot = Mth.cos(ageInTicks * 0.05F) * 0.2F;
+		this.arm_right.zRot = (float) -(Math.PI / 6) - Mth.cos(entity.ageInTicks * 0.05F) * 0.2F;
+		this.arm_left.zRot = (float) (Math.PI / 6) + Mth.cos(entity.ageInTicks * 0.05F) * 0.2F;
 
-		this.arm_right.zRot = (float) -(Math.PI / 6) - Mth.cos(ageInTicks * 0.05F) * 0.2F;
-		this.arm_left.zRot = (float) (Math.PI / 6) + Mth.cos(ageInTicks * 0.05F) * 0.2F;
+		this.arm_right.xRot += 0.45F * entity.walkAnimationSpeed;
+		this.arm_left.xRot += 0.45F * entity.walkAnimationSpeed;
 
-		this.arm_right.xRot += 0.45F * limbSwingAmount;
-		this.arm_left.xRot += 0.45F * limbSwingAmount;
+		this.leg_right_front.xRot = Mth.clamp(-0.45F + 0.45F * entity.walkAnimationSpeed, -0.45F, 0.0F);
+		this.leg_right_front.zRot = Mth.clamp(0.45F - 0.45F * entity.walkAnimationSpeed, 0.0F, 0.45F);
 
-		this.leg_right_front.xRot = Mth.clamp(-0.45F + 0.45F * limbSwingAmount, -0.45F, 0.0F);
-		this.leg_right_front.zRot = Mth.clamp(0.45F - 0.45F * limbSwingAmount, 0.0F, 0.45F);
+		this.leg_left_front.xRot = Mth.clamp(-0.45F + 0.45F * entity.walkAnimationSpeed, -0.45F, 0.0F);
+		this.leg_left_front.zRot = Mth.clamp(-0.45F + 0.45F * entity.walkAnimationSpeed, -0.45F, 0.0F);
 
-		this.leg_left_front.xRot = Mth.clamp(-0.45F + 0.45F * limbSwingAmount, -0.45F, 0.0F);
-		this.leg_left_front.zRot = Mth.clamp(-0.45F + 0.45F * limbSwingAmount, -0.45F, 0.0F);
+		this.leg_right_hind.xRot = Mth.clamp(0.45F - 0.45F * entity.walkAnimationSpeed, 0.0F, 0.45F);
+		this.leg_right_hind.zRot = Mth.clamp(0.45F - 0.45F * entity.walkAnimationSpeed, 0.0F, 0.45F);
 
-		this.leg_right_hind.xRot = Mth.clamp(0.45F - 0.45F * limbSwingAmount, 0.0F, 0.45F);
-		this.leg_right_hind.zRot = Mth.clamp(0.45F - 0.45F * limbSwingAmount, 0.0F, 0.45F);
+		this.leg_left_hind.xRot = Mth.clamp(0.45F - 0.45F * entity.walkAnimationSpeed, 0.0F, 0.45F);
+		this.leg_left_hind.zRot = Mth.clamp(-0.45F + 0.45F * entity.walkAnimationSpeed, -0.45F, 0.0F);
 
-		this.leg_left_hind.xRot = Mth.clamp(0.45F - 0.45F * limbSwingAmount, 0.0F, 0.45F);
-		this.leg_left_hind.zRot = Mth.clamp(-0.45F + 0.45F * limbSwingAmount, -0.45F, 0.0F);
+		this.head.xRot -= (float) ((Math.PI / 6F) * entity.walkAnimationSpeed);
 
-		this.head.xRot -= (float) ((Math.PI / 6F) * limbSwingAmount);
-
-		this.leg_right_front.xRot += 0.45F * limbSwingAmount;
-		this.leg_left_front.xRot += 0.45F * limbSwingAmount;
-		this.leg_right_hind.xRot += 0.45F * limbSwingAmount;
-		this.leg_left_hind.xRot += 0.45F * limbSwingAmount;
+		this.leg_right_front.xRot += 0.45F * entity.walkAnimationSpeed;
+		this.leg_left_front.xRot += 0.45F * entity.walkAnimationSpeed;
+		this.leg_right_hind.xRot += 0.45F * entity.walkAnimationSpeed;
+		this.leg_left_hind.xRot += 0.45F * entity.walkAnimationSpeed;
 	}
 
 	@Override

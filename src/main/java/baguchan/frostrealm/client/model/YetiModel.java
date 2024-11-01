@@ -3,22 +3,22 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.0.3
 // Paste this class into your mod and generate all required imports
 
 
-import bagu_chan.bagus_lib.client.layer.IArmor;
 import baguchan.frostrealm.client.animation.YetiAnimations;
+import baguchan.frostrealm.client.render.state.YetiRenderState;
 import baguchan.frostrealm.entity.Yeti;
+import baguchi.bagus_lib.client.layer.IArmor;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.ArmedModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
-import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements HeadedModel, ArmedModel, IArmor {
+public class YetiModel<T extends YetiRenderState> extends EntityModel<T> implements HeadedModel, ArmedModel, IArmor {
     private final ModelPart realRoot;
     private final ModelPart root;
 
@@ -30,7 +30,7 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
     public final ModelPart leftLeg;
 
 	public YetiModel(ModelPart part) {
-		super();
+		super(part);
 		this.realRoot = part;
 		this.root = part.getChild("root");
 		this.head = this.root.getChild("head");
@@ -40,12 +40,6 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 		this.rightLeg = this.root.getChild("right_leg");
 		this.leftLeg = this.root.getChild("left_leg");
 	}
-
-	@Override
-	public ModelPart root() {
-		return this.realRoot;
-	}
-
 	public static LayerDefinition createBodyLayer() {
 		MeshDefinition meshdefinition = new MeshDefinition();
 		PartDefinition partdefinition = meshdefinition.getRoot();
@@ -72,10 +66,10 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(T entity) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-		this.head.xRot = headPitch * ((float) Math.PI / 180F);
+		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
 		float f = 1.0F;
 
@@ -83,11 +77,11 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 			f = 1.0F;
 		}
 
-		float f1 = attackTime;
-		if (entity.isTrade()) {
+		float f1 = entity.attackTime;
+		if (entity.state == Yeti.State.TRADE) {
 			this.head.xRot = 30F * ((float) Math.PI / 180F);
 			this.head.yRot = 0.0F;
-			if (entity.getMainArm() == HumanoidArm.LEFT) {
+			if (entity.mainArm == HumanoidArm.LEFT) {
 				this.applyStatic(YetiAnimations.holding_right);
 			} else {
 				this.applyStatic(YetiAnimations.holding_left);
@@ -95,7 +89,7 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 		}
 
 		if (f1 > 0) {
-			if (entity.getMainArm() == HumanoidArm.RIGHT) {
+			if (entity.mainArm == HumanoidArm.RIGHT) {
 				this.rightArm.xRot = 0.0F;
 				this.rightArm.zRot -= Mth.sin((float) Math.PI * f1) * 0.75F;
 				this.rightArm.xRot -= Mth.sin((float) Math.PI * f1) * 0.5F;
@@ -106,18 +100,12 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 			}
 		}
 		if (entity.sitPoseAnimationState.isStarted() || entity.sitAnimationState.isStarted() || entity.sitUpAnimationState.isStarted()) {
-			this.animate(entity.sitAnimationState, YetiAnimations.sit_start, ageInTicks);
-			this.animate(entity.sitPoseAnimationState, YetiAnimations.sit, ageInTicks);
-			this.animate(entity.sitUpAnimationState, YetiAnimations.sit_stop, ageInTicks);
+			this.animate(entity.sitAnimationState, YetiAnimations.sit_start, entity.ageInTicks);
+			this.animate(entity.sitPoseAnimationState, YetiAnimations.sit, entity.ageInTicks);
+			this.animate(entity.sitUpAnimationState, YetiAnimations.sit_stop, entity.ageInTicks);
 		} else {
-			this.animateWalk(YetiAnimations.walk, limbSwing, limbSwingAmount, 1.0F, 3.0F);
+			this.animateWalk(YetiAnimations.walk, entity.walkAnimationPos, entity.walkAnimationSpeed, 1.0F, 3.0F);
 		}
-	}
-
-	private HumanoidArm getAttackArm(T p_102857_) {
-
-		HumanoidArm humanoidarm = p_102857_.getMainArm();
-		return p_102857_.swingingArm == InteractionHand.MAIN_HAND ? humanoidarm : humanoidarm.getOpposite();
 	}
 
 	public ModelPart getArm(HumanoidArm p_102923_) {
@@ -132,11 +120,6 @@ public class YetiModel<T extends Yeti> extends HierarchicalModel<T> implements H
 		this.root.translateAndRotate(p_102926_);
 		this.getArm(p_102925_).translateAndRotate(p_102926_);
 		p_102926_.translate(0, 0.8D, 0);
-		if (this.young) {
-			p_102926_.scale(1.5F, 1.5F, 1.5F);
-			p_102926_.translate(-0.75F, -0.4F, 0.0F);
-			p_102926_.scale(1.4F, 1.4F, 1.4F);
-		}
 	}
 
 	@Override

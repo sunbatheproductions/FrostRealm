@@ -3,6 +3,7 @@ package baguchan.frostrealm.entity.animal;
 import baguchan.frostrealm.registry.FrostEntities;
 import baguchan.frostrealm.registry.FrostTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -75,7 +76,7 @@ public class Ferret extends TamableAnimal {
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this, Player.class).setAlertOthers());
-        this.targetSelector.addGoal(2, new NonTameRandomTargetGoal<>(this, Animal.class, false, PREY_SELECTOR));
+        this.targetSelector.addGoal(2, new NonTameRandomTargetGoal<>(this, Animal.class, false, (living, serverLevel) -> PREY_SELECTOR.test(living)));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -103,12 +104,12 @@ public class Ferret extends TamableAnimal {
         if (!this.level().isClientSide || this.isBaby() && this.isFood(itemstack)) {
             if (this.isTame()) {
                 if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
-                    FoodProperties foodproperties = itemstack.getFoodProperties(this);
+                    FoodProperties foodproperties = itemstack.get(DataComponents.FOOD);
                     float f = foodproperties != null ? (float) foodproperties.nutrition() : 1.0F;
                     this.heal(f);
                     itemstack.consume(1, p_30412_);
                     this.gameEvent(GameEvent.EAT); // Neo: add EAT game event
-                    return InteractionResult.sidedSuccess(this.level().isClientSide());
+                    return InteractionResult.SUCCESS_SERVER;
                 } else {
                     if (item instanceof DyeItem dyeitem && this.isOwnedBy(p_30412_)) {
                         DyeColor dyecolor = dyeitem.getDyeColor();
@@ -126,7 +127,7 @@ public class Ferret extends TamableAnimal {
                         this.jumping = false;
                         this.navigation.stop();
                         this.setTarget(null);
-                        return InteractionResult.SUCCESS_NO_ITEM_USED;
+                        return InteractionResult.TRY_WITH_EMPTY_HAND;
                     } else {
                         return interactionresult;
                     }
@@ -167,7 +168,7 @@ public class Ferret extends TamableAnimal {
     }
 
     public static boolean checkWolfSpawnRules(
-            EntityType<Ferret> p_218292_, LevelAccessor p_218293_, MobSpawnType p_218294_, BlockPos p_218295_, RandomSource p_218296_
+            EntityType<Ferret> p_218292_, LevelAccessor p_218293_, EntitySpawnReason p_218294_, BlockPos p_218295_, RandomSource p_218296_
     ) {
         return p_218293_.getBlockState(p_218295_.below()).is(FrostTags.Blocks.ANIMAL_SPAWNABLE) && isBrightEnoughToSpawn(p_218293_, p_218295_);
     }
@@ -217,7 +218,7 @@ public class Ferret extends TamableAnimal {
 
     @Override
     public @Nullable AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        return FrostEntities.FERRET.get().create(p_146743_);
+        return FrostEntities.FERRET.get().create(p_146743_, EntitySpawnReason.BREEDING);
     }
 
     @Override

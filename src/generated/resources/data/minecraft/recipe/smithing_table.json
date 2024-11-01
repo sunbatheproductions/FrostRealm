@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "S": {
-      "item": "frostrealm:astrium_ingot"
-    },
-    "W": {
-      "tag": "minecraft:planks"
-    }
+    "S": "frostrealm:astrium_ingot",
+    "W": "#minecraft:planks"
   },
   "pattern": [
     "SS",

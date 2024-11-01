@@ -9,7 +9,6 @@
     "ServerEntityMixin"
   ],
   "client": [
-    "client.HierarchicalModelAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

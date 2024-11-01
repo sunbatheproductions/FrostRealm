@@ -39,12 +39,12 @@ public class WolfflueVariants {
         context.register(key, new WolfflueVariant(resourcelocation, resourcelocation2, biomeHolderSet));
     }
 
-    public static Holder<WolfflueVariant> getSpawnVariant(RegistryAccess access, Holder<Biome> biomeHolder) {
-        Registry<WolfflueVariant> registry = access.registryOrThrow(WOLFFLUE_VARIANT_REGISTRY_KEY);
-        return registry.holders()
-                .filter(p_332674_ -> p_332674_.value().biomes().contains(biomeHolder))
+    public static Holder<WolfflueVariant> getSpawnVariant(RegistryAccess p_332694_, Holder<Biome> p_332773_) {
+        Registry<WolfflueVariant> registry = p_332694_.lookupOrThrow(WOLFFLUE_VARIANT_REGISTRY_KEY);
+        return registry.listElements()
+                .filter(p_332674_ -> p_332674_.value().biomes().contains(p_332773_))
                 .findFirst()
-                .or(() -> registry.getHolder(DEFAULT))
+                .or(() -> registry.get(DEFAULT))
                 .or(registry::getAny)
                 .orElseThrow();
     }

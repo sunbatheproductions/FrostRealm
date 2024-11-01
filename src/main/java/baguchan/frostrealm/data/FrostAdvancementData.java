@@ -10,9 +10,13 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.common.data.AdvancementProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
@@ -31,6 +35,8 @@ public class FrostAdvancementData extends AdvancementProvider {
 		@SuppressWarnings("unused")
 		@Override
         public void generate(HolderLookup.Provider provider, Consumer<AdvancementHolder> consumer, ExistingFileHelper existingFileHelper) {
+			HolderLookup<Item> lookupItem = provider.lookupOrThrow(Registries.ITEM);
+			HolderLookup.RegistryLookup<EntityType<?>> lookupEntity = provider.lookupOrThrow(Registries.ENTITY_TYPE);
 
 			AdvancementHolder root = Advancement.Builder.advancement()
 					.display(FrostItems.STRAY_NECKLACE_PART.get(),
@@ -103,7 +109,7 @@ public class FrostAdvancementData extends AdvancementProvider {
 							Component.translatable("advancement.frostrealm.tame_wolfflue.desc"),
 							null,
 							AdvancementType.TASK, true, true, false)
-					.addCriterion("has_item", TameAnimalTrigger.TriggerInstance.tamedAnimal(EntityPredicate.Builder.entity().of(FrostEntities.WOLFFLUE.get())))
+					.addCriterion("has_item", TameAnimalTrigger.TriggerInstance.tamedAnimal(EntityPredicate.Builder.entity().of(lookupEntity, FrostEntities.WOLFFLUE.get())))
 					.save(consumer, "frostrealm:tame_wolfflue");
 
 			Advancement.Builder.advancement()
@@ -121,9 +127,9 @@ public class FrostAdvancementData extends AdvancementProvider {
 					.addCriterion(
 							"smithing_crystal",
 							RecipeCraftedTrigger.TriggerInstance.craftedItem(
-									ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "smiting_crystal_with_weapon"),
+									ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "smiting_crystal_with_weapon")),
 									List.of(
-											ItemPredicate.Builder.item().of(FrostItems.FROST_CRYSTAL.get())
+											ItemPredicate.Builder.item().of(lookupItem, FrostItems.FROST_CRYSTAL.get())
 									)
 							)
 					)

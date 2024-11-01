@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": {
-      "item": "frostrealm:frost_crystal"
-    },
-    "M": {
-      "tag": "c:rods/wooden"
-    }
+    "C": "frostrealm:frost_crystal",
+    "M": "#c:rods/wooden"
   },
   "pattern": [
     "C",

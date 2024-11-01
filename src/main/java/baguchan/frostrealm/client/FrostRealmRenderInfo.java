@@ -11,9 +11,9 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -34,17 +34,12 @@ public class FrostRealmRenderInfo extends DimensionSpecialEffects {
     }
 
     @Override
-    public float[] getSunriseColor(float p_108872_, float p_108873_) {
-        return null;
-    }
-
-    @Override
     public boolean isFoggyAt(int p_108874_, int p_108875_) {
         return false;
     }
 
     @Override
-    public boolean renderSky(ClientLevel level, int ticks, float partialTick, Matrix4f modelViewMatrix, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
+    public boolean renderSky(ClientLevel level, int ticks, float partialTick, Matrix4f modelViewMatrix, Camera camera, Matrix4f projectionMatrix, Runnable setupFog) {
         PoseStack poseStack = new PoseStack();
         poseStack.pushPose();
         poseStack.mulPose(modelViewMatrix);
@@ -61,7 +56,7 @@ public class FrostRealmRenderInfo extends DimensionSpecialEffects {
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         p_109781_.pushPose();
         float f11 = (1.0F - weatherLevel);
-        FogRenderer.levelFogColor();
+        FogRenderer.toggleFog();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, f11);
 
         Matrix4f matrix4f1 = p_109781_.last().pose();
@@ -72,7 +67,7 @@ public class FrostRealmRenderInfo extends DimensionSpecialEffects {
         float u2 = 1F;
         float v2 = 1F;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         RenderSystem.setShaderTexture(0, AURORA_LOCATION);
         bufferbuilder.addVertex(matrix4f1, -f12, (float) f13, -f12).setUv(u1, v1);
         bufferbuilder.addVertex(matrix4f1, f12, (float) f13, -f12).setUv(u2, v1);
@@ -88,7 +83,7 @@ public class FrostRealmRenderInfo extends DimensionSpecialEffects {
     }
 
     @Override
-    public boolean renderClouds(ClientLevel level, int ticks, float partialTick, PoseStack poseStack, double camX, double camY, double camZ, Matrix4f modelViewMatrix, Matrix4f projectionMatrix) {
+    public boolean renderClouds(ClientLevel level, int ticks, float partialTick, double camX, double camY, double camZ, Matrix4f modelViewMatrix, Matrix4f projectionMatrix) {
         return true;
     }
 

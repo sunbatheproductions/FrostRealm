@@ -3,18 +3,18 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.10.4
 // Paste this class into your mod and generate all required imports
 
 
-import baguchan.frostrealm.entity.projectile.VenomBall;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.ProjectileRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 
-public class VenomBallModel<T extends VenomBall> extends HierarchicalModel<T> {
+public class VenomBallModel<T extends ProjectileRenderState> extends EntityModel<T> {
     private final ModelPart root;
 
     public VenomBallModel(ModelPart root) {
-        super(RenderType::eyes);
+        super(root, RenderType::eyes);
         this.root = root.getChild("root");
     }
 
@@ -26,15 +26,5 @@ public class VenomBallModel<T extends VenomBall> extends HierarchicalModel<T> {
                 .texOffs(16, 0).addBox(-2.0F, -3.0F, 2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 23.0F, 0.0F));
 
         return LayerDefinition.create(meshdefinition, 32, 32);
-    }
-
-    @Override
-    public void setupAnim(VenomBall entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.root;
     }
 }

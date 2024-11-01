@@ -6,8 +6,9 @@ import baguchan.frostrealm.entity.animal.*;
 import baguchan.frostrealm.entity.hostile.*;
 import baguchan.frostrealm.entity.hostile.part.CorruptedWalker;
 import baguchan.frostrealm.entity.projectile.VenomBall;
-import baguchan.frostrealm.entity.projectile.WarpedCrystalShard;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
@@ -38,7 +39,6 @@ public class FrostEntities {
     public static final Supplier<EntityType<Yeti>> YETI = ENTITIES.register("yeti", () -> EntityType.Builder.of(Yeti::new, MobCategory.CREATURE).sized(1.6F, 1.95F).eyeHeight(1.75F).build(prefix("yeti")));
     public static final Supplier<EntityType<FrostWraith>> FROST_WRAITH = ENTITIES.register("frost_wraith", () -> EntityType.Builder.of(FrostWraith::new, FrostMobCategory.FROSTREALM_WEATHER_MONSTER).sized(0.6F, 2.1F).build(prefix("frost_wraith")));
     public static final Supplier<EntityType<Seeker>> SEEKER = ENTITIES.register("seeker", () -> EntityType.Builder.of(Seeker::new, MobCategory.MONSTER).sized(0.6F, 1.99F).immuneTo(Blocks.POWDER_SNOW).clientTrackingRange(8).build(prefix("seeker")));
-    public static final Supplier<EntityType<MindVine>> MIND_VINE = ENTITIES.register("mind_vine", () -> EntityType.Builder.of(MindVine::new, MobCategory.MONSTER).sized(0.5F, 2.375F).eyeHeight(0.35F).clientTrackingRange(8).build(prefix("mind_vine")));
 
     public static final Supplier<EntityType<AstraBall>> ASTRA_BALL = ENTITIES.register("astra_ball", () -> EntityType.Builder.of(AstraBall::new, MobCategory.MONSTER).sized(0.5F, 0.5F).eyeHeight(0.25F).build(prefix("astra_ball")));
     public static final Supplier<EntityType<FrostBoar>> FROST_BOAR = ENTITIES.register("frost_boar", () -> EntityType.Builder.of(FrostBoar::new, MobCategory.CREATURE).sized(1.8F, 1.95F).eyeHeight(1.5F).build(prefix("frost_boar")));
@@ -46,12 +46,11 @@ public class FrostEntities {
     public static final Supplier<EntityType<Venochem>> VENOCHEM = ENTITIES.register("venochem", () -> EntityType.Builder.of(Venochem::new, MobCategory.MONSTER).sized(0.9F, 0.8F).eyeHeight(0.45F).fireImmune().build(prefix("venochem")));
     public static final Supplier<EntityType<Gokkur>> GOKKUR = ENTITIES.register("gokkur", () -> EntityType.Builder.of(Gokkur::new, MobCategory.MONSTER).sized(1.0F, 1.2F).eyeHeight(0.525F).fireImmune().build(prefix("gokkur")));
 
-    public static final Supplier<EntityType<WarpedCrystalShard>> WARPED_CRYSTAL_SHARD = ENTITIES.register("warped_crystal", () -> EntityType.Builder.<WarpedCrystalShard>of(WarpedCrystalShard::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10).build(prefix("warped_crystal")));
     public static final Supplier<EntityType<VenomBall>> VENOM_BALL = ENTITIES.register("venom_ball", () -> EntityType.Builder.<VenomBall>of(VenomBall::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(8).updateInterval(30).build(prefix("venom_ball")));
 
 
-    private static String prefix(String path) {
-        return FrostRealm.MODID + "." + path;
+    private static ResourceKey<EntityType<?>> prefix(String path) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, FrostRealm.prefix(path));
     }
 
 
@@ -67,7 +66,6 @@ public class FrostEntities {
         event.put(YETI.get(), Yeti.createAttributeMap().build());
         event.put(FROST_WRAITH.get(), FrostWraith.createAttributes().build());
         event.put(SEEKER.get(), Seeker.createAttributes().build());
-        event.put(MIND_VINE.get(), MindVine.createAttributes().build());
         event.put(ASTRA_BALL.get(), AstraBall.createAttributes().build());
         event.put(FROST_BOAR.get(), FrostBoar.createAttributes().build());
         event.put(CORRUPTED_WALKER.get(), CorruptedWalker.createAttributeMap().build());

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "M": {
-      "item": "frostrealm:perma_slate_brick"
-    }
+    "M": "frostrealm:perma_slate_brick"
   },
   "pattern": [
     "M  ",

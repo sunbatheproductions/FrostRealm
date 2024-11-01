@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "A": {
-      "item": "frostrealm:astrium_raw"
-    }
+    "A": "frostrealm:astrium_raw"
   },
   "pattern": [
     "AAA",

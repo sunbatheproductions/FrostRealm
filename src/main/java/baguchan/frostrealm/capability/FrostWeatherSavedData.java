@@ -112,7 +112,7 @@ public class FrostWeatherSavedData extends SavedData {
 		data.weatherTime = nbt.getInt("WeatherTime");
 		data.unstableLevel = nbt.getFloat("UnstableLevel");
 		data.auroraLevel = nbt.getFloat("AuroraLevel");
-		FrostWeather frostWeather = FrostWeathers.getRegistry().get(ResourceLocation.tryParse(nbt.getString("FrostWeather")));
+		FrostWeather frostWeather = FrostWeathers.getRegistry().getValue(ResourceLocation.tryParse(nbt.getString("FrostWeather")));
 		if (frostWeather != null) {
 			data.frostWeather = frostWeather;
 		} else {

@@ -45,7 +45,7 @@ public class FrostGrassBlock extends SpreadingSnowyDirtBlock implements Bonemeal
 	public void performBonemeal(ServerLevel p_221270_, RandomSource p_221271_, BlockPos p_221272_, BlockState p_221273_) {
 		BlockPos blockpos = p_221272_.above();
 		BlockState blockstate = FrostBlocks.COLD_GRASS.get().defaultBlockState();
-		Optional<Holder.Reference<PlacedFeature>> optional = p_221270_.registryAccess().registryOrThrow(Registries.PLACED_FEATURE).getHolder(FrostPlacements.PATCH_TUNDRA_GRASS_BONEMEAL);
+		Optional<Holder.Reference<PlacedFeature>> optional = p_221270_.registryAccess().lookupOrThrow(Registries.PLACED_FEATURE).get(FrostPlacements.PATCH_TUNDRA_GRASS_BONEMEAL);
 
 		label49:
 		for (int i = 0; i < 128; ++i) {
@@ -114,8 +114,8 @@ public class FrostGrassBlock extends SpreadingSnowyDirtBlock implements Bonemeal
 		} else if (blockstate.getFluidState().getAmount() == 8) {
 			return false;
 		} else {
-			int i = LightEngine.getLightBlockInto(p_56825_, p_56824_, p_56826_, blockstate, blockpos, Direction.UP, blockstate.getLightBlock(p_56825_, blockpos));
-			return i < p_56825_.getMaxLightLevel();
+			int i = LightEngine.getLightBlockInto(p_56824_, blockstate, Direction.UP, blockstate.getLightBlock());
+			return i < 15;
 		}
 	}
 

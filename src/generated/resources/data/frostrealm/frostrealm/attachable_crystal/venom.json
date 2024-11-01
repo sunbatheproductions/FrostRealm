@@ -4,11 +4,6 @@
   "mob_effects": {
     "duration": 200,
     "id": "minecraft:poison",
-    "neoforge:cures": [
-      "milk",
-      "protected_by_totem",
-      "honey"
-    ],
     "show_icon": true
   },
   "usage": 30

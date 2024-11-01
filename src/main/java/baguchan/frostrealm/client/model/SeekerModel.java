@@ -3,23 +3,20 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.7.4
 // Paste this class into your mod and generate all required imports
 
 
-import bagu_chan.bagus_lib.client.layer.IArmor;
 import baguchan.frostrealm.client.animation.SpearAttackAnimations;
-import baguchan.frostrealm.entity.hostile.Seeker;
-import baguchan.frostrealm.mixin.client.HierarchicalModelAccessor;
+import baguchan.frostrealm.client.render.state.SeekerRenderState;
+import baguchi.bagus_lib.client.layer.IArmor;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.animation.AnimationDefinition;
-import net.minecraft.client.animation.KeyframeAnimations;
 import net.minecraft.client.model.ArmedModel;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class SeekerModel<T extends Seeker> extends HierarchicalModel<T> implements IArmor, ArmedModel {
+public class SeekerModel<T extends SeekerRenderState> extends EntityModel<T> implements IArmor, ArmedModel {
     public final ModelPart root;
     public final ModelPart body;
     public final ModelPart head;
@@ -32,6 +29,7 @@ public class SeekerModel<T extends Seeker> extends HierarchicalModel<T> implemen
     private final ModelPart left_leg;
 
     public SeekerModel(ModelPart root) {
+        super(root);
         this.root = root;
         this.body = root.getChild("body");
         this.head = root.getChild("head");
@@ -69,55 +67,48 @@ public class SeekerModel<T extends Seeker> extends HierarchicalModel<T> implemen
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F);
+        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-        this.right_leg.xRot = Mth.cos(limbSwing * 0.6662F) * 0.7F * limbSwingAmount;
-        this.left_leg.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 0.7F * limbSwingAmount;
+        this.right_leg.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 0.7F * entity.walkAnimationSpeed;
+        this.left_leg.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 0.7F * entity.walkAnimationSpeed;
         this.right_leg.yRot = 0.0F;
         this.left_leg.yRot = 0.0F;
         this.right_leg.zRot = 0.0F;
         this.left_leg.zRot = 0.0F;
 
-        float f = ageInTicks - entity.tickCount;
+        float f = entity.partialTick;
         float f2 = entity.guardAnimationScale.getAnimationScale(f);
 
         if (!entity.attackAnimationState.isStarted() && !entity.counterAnimationState.isStarted() && entity.guardAnimationScale.getAnimationScale(f) <= 0) {
-            if (entity.getMainArm() == HumanoidArm.RIGHT) {
+            if (entity.mainArm == HumanoidArm.RIGHT) {
                 this.applyStatic(SpearAttackAnimations.idle_right);
             } else {
                 this.applyStatic(SpearAttackAnimations.idle_left);
             }
         }
 
-        if (entity.getMainArm() == HumanoidArm.RIGHT) {
-            this.animate(entity.attackAnimationState, SpearAttackAnimations.spear_attack_right, ageInTicks);
+        if (entity.mainArm == HumanoidArm.RIGHT) {
+            this.animate(entity.attackAnimationState, SpearAttackAnimations.spear_attack_right, entity.ageInTicks);
         } else {
-            this.animate(entity.attackAnimationState, SpearAttackAnimations.spear_attack_left, ageInTicks);
+            this.animate(entity.attackAnimationState, SpearAttackAnimations.spear_attack_left, entity.ageInTicks);
         }
 
-        if (entity.getMainArm() == HumanoidArm.RIGHT) {
-            this.animate(entity.counterAnimationState, SpearAttackAnimations.counter_right, ageInTicks);
+        if (entity.mainArm == HumanoidArm.RIGHT) {
+            this.animate(entity.counterAnimationState, SpearAttackAnimations.counter_right, entity.ageInTicks);
         } else {
-            this.animate(entity.counterAnimationState, SpearAttackAnimations.counter_left, ageInTicks);
+            this.animate(entity.counterAnimationState, SpearAttackAnimations.counter_left, entity.ageInTicks);
         }
-
         if (!entity.counterAnimationState.isStarted()) {
-            if (entity.getMainArm() == HumanoidArm.RIGHT) {
-                this.applyStaticWithScale(SpearAttackAnimations.guard_right, entity.guardAnimationScale.getAnimationScale(f));
+            if (entity.mainArm == HumanoidArm.RIGHT) {
+                this.animateWalk(SpearAttackAnimations.guard_right, 0.0F, entity.guardAnimationScale.getAnimationScale(f), 1.0F, 1.0F);
             } else {
-                this.applyStaticWithScale(SpearAttackAnimations.guard_left, entity.guardAnimationScale.getAnimationScale(f));
+                this.animateWalk(SpearAttackAnimations.guard_left, 0.0F, entity.guardAnimationScale.getAnimationScale(f), 1.0F, 1.0F);
             }
         }
     }
-
-    @Override
-    public ModelPart root() {
-        return root;
-    }
-
     @Override
     public void translateToHead(ModelPart modelPart, PoseStack poseStack) {
         modelPart.translateAndRotate(poseStack);
@@ -174,10 +165,6 @@ public class SeekerModel<T extends Seeker> extends HierarchicalModel<T> implemen
 
     private ModelPart getArmItem(HumanoidArm p_102923_) {
         return p_102923_ == HumanoidArm.LEFT ? this.left_item : this.right_item;
-    }
-
-    protected void applyStaticWithScale(AnimationDefinition p_288996_, float scale) {
-        KeyframeAnimations.animate(this, p_288996_, 0L, scale, HierarchicalModelAccessor.getAnimationVector());
     }
 
 

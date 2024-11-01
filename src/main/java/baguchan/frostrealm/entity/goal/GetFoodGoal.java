@@ -33,7 +33,7 @@ public class GetFoodGoal<T extends Yeti> extends Goal {
         if (this.mob.getNavigation().getTargetPos().closerThan(this.mob.blockPosition(), 2D)) {
             List<ItemEntity> list = this.mob.level().getEntitiesOfClass(ItemEntity.class, this.mob.getBoundingBox().inflate(4.0D, 4.0D, 4.0D), Yeti.ALLOWED_ITEMS);
             if (!list.isEmpty()) {
-                this.mob.pickUpItem(list.get(0));
+                this.mob.pickUpItem(getServerLevel(this.mob), list.get(0));
             }
         }
 

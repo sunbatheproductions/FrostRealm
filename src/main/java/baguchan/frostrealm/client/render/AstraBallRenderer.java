@@ -6,12 +6,13 @@ import baguchan.frostrealm.client.model.AstraBallModel;
 import baguchan.frostrealm.entity.hostile.AstraBall;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class AstraBallRenderer<T extends AstraBall> extends MobRenderer<T, AstraBallModel<T>> {
+public class AstraBallRenderer<T extends AstraBall> extends MobRenderer<T, LivingEntityRenderState, AstraBallModel<LivingEntityRenderState>> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/astra_ball.png");
 
     public AstraBallRenderer(EntityRendererProvider.Context p_173952_) {
@@ -19,7 +20,12 @@ public class AstraBallRenderer<T extends AstraBall> extends MobRenderer<T, Astra
     }
 
     @Override
-    public ResourceLocation getTextureLocation(T p_110775_1_) {
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(LivingEntityRenderState p_110775_1_) {
         return TEXTURE;
     }
 }

@@ -1,9 +1,9 @@
 package baguchan.frostrealm.entity.hostile;
 
-import bagu_chan.bagus_lib.entity.goal.AnimateAttackGoal;
 import baguchan.frostrealm.entity.goal.ShootProjectileAnimationGoal;
 import baguchan.frostrealm.entity.projectile.VenomBall;
 import baguchan.frostrealm.registry.FrostEntities;
+import baguchi.bagus_lib.entity.goal.AnimateAttackGoal;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;

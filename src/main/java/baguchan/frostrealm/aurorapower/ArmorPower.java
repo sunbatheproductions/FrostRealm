@@ -22,7 +22,7 @@ public class ArmorPower extends AuroraPower {
     @Override
     public boolean canApplyItem(ItemStack stack) {
         return stack.getItem() instanceof ArmorItem && Arrays.stream(this.getSlots()).anyMatch(slot -> {
-            return slot == ((ArmorItem) stack.getItem()).getEquipmentSlot();
+            return slot == ((ArmorItem) stack.getItem()).getEquipmentSlot(stack);
         });
     }
 }

@@ -26,7 +26,6 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.PolarBear;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -42,8 +41,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class Seal extends Animal {
     private static final EntityDimensions BABY_DIMENSIONS = FrostEntities.SEAL.get().getDimensions().scale(0.5F).withEyeHeight(0.25F);
-
-    public static final Ingredient FOOD_ITEMS = Ingredient.of(ItemTags.FISHES);
 
     @javax.annotation.Nullable
     protected RandomStrollGoal randomStrollGoal;
@@ -81,7 +78,7 @@ public class Seal extends Animal {
         });
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.3F));
         this.goalSelector.addGoal(2, new BreedGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.15D, FOOD_ITEMS, false));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.15D, (item) -> item.is(ItemTags.FISHES), false));
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.25D));
         this.goalSelector.addGoal(5, new AvoidEntityGoal<>(this, PolarBear.class, 8F, 1.25F, 1.35F));
 
@@ -95,7 +92,7 @@ public class Seal extends Animal {
 
     @Override
     public boolean isFood(ItemStack p_27600_) {
-        return FOOD_ITEMS.test(p_27600_);
+        return p_27600_.is(ItemTags.FISHES);
     }
 
 
@@ -154,7 +151,7 @@ public class Seal extends Animal {
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_28332_, DifficultyInstance p_28333_, MobSpawnType p_28334_, @javax.annotation.Nullable SpawnGroupData p_28335_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_28332_, DifficultyInstance p_28333_, EntitySpawnReason p_28334_, @javax.annotation.Nullable SpawnGroupData p_28335_) {
         boolean flag = false;
         if (p_28335_ instanceof AgeableMobGroupData) {
             if (((AgeableMobGroupData) p_28335_).getGroupSize() >= 2) {
@@ -180,7 +177,7 @@ public class Seal extends Animal {
         return p_27574_.getBlockState(p_27573_).is(Blocks.WATER) ? 10.0F : p_27574_.getPathfindingCostFromLightLevels(p_27573_) - 0.5F;
     }
 
-    public static boolean checkSealSpawnRules(EntityType<? extends Animal> p_218105_, LevelAccessor p_218106_, MobSpawnType p_218107_, BlockPos p_218108_, RandomSource p_218109_) {
+    public static boolean checkSealSpawnRules(EntityType<? extends Animal> p_218105_, LevelAccessor p_218106_, EntitySpawnReason p_218107_, BlockPos p_218108_, RandomSource p_218109_) {
         return p_218106_.getBlockState(p_218108_.below()).is(FrostTags.Blocks.SEAL_SPAWNABLE) && isBrightEnoughToSpawn(p_218106_, p_218108_);
     }
 
@@ -210,7 +207,7 @@ public class Seal extends Animal {
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        return FrostEntities.SEAL.get().create(p_146743_);
+        return FrostEntities.SEAL.get().create(p_146743_, EntitySpawnReason.BREEDING);
     }
 
     @Override
@@ -231,15 +228,15 @@ public class Seal extends Animal {
     }
 
     @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
+    protected void customServerAiStep(ServerLevel serverLevel) {
+        super.customServerAiStep(serverLevel);
         int l;
         if (this.destroyBlocksTick > 0) {
             --this.destroyBlocksTick;
         }
 
         if (this.verticalCollision && this.isInWater()) {
-            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief(this.level(), this)) {
+            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief(serverLevel, this)) {
                     boolean flag = false;
                     AABB aabb = this.getBoundingBox().inflate(0.2);
 

@@ -4,14 +4,14 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.1.5
 
 
 import baguchan.frostrealm.client.animation.CrystalFoxAnimations;
-import baguchan.frostrealm.entity.animal.CrystalFox;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.CrystalFoxRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 
-public class CrystalFoxModel<T extends CrystalFox> extends HierarchicalModel<T> {
+public class CrystalFoxModel<T extends CrystalFoxRenderState> extends EntityModel<T> {
 	public final ModelPart main;
 	public final ModelPart body;
 	public final ModelPart head;
@@ -22,6 +22,7 @@ public class CrystalFoxModel<T extends CrystalFox> extends HierarchicalModel<T> 
 	private final ModelPart leg_right_hind;
 
 	public CrystalFoxModel(ModelPart root) {
+		super(root);
 		this.main = root.getChild("main");
 		this.body = this.main.getChild("body");
 		this.head = this.body.getChild("head");
@@ -69,19 +70,14 @@ public class CrystalFoxModel<T extends CrystalFox> extends HierarchicalModel<T> 
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.head.xRot = headPitch * ((float) Math.PI / 180F);
-		this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-		this.leg_right_hind.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-		this.leg_left_hind.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-		this.leg_right_front.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-		this.leg_left_front.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-		this.animate(entity.eatAnimationState, CrystalFoxAnimations.CRYSTAL_FOX_EATING, ageInTicks);
-	}
-
-	@Override
-	public ModelPart root() {
-		return this.main;
+	public void setupAnim(T entity) {
+		super.setupAnim(entity);
+		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.leg_right_hind.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed;
+		this.leg_left_hind.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;
+		this.leg_right_front.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;
+		this.leg_left_front.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed;
+		this.animate(entity.eatAnimationState, CrystalFoxAnimations.CRYSTAL_FOX_EATING, entity.ageInTicks);
 	}
 }

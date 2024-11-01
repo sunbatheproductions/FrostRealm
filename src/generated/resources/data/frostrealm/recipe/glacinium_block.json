@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "A": {
-      "item": "frostrealm:glacinium_ingot"
-    }
+    "A": "frostrealm:glacinium_ingot"
   },
   "pattern": [
     "AAA",

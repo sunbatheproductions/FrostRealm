@@ -12,9 +12,9 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 
 public class FrostBiomeDefaultFeatures {
 	public static void addDefaultCarvers(BiomeGenerationSettings.Builder p_194721_) {
-		p_194721_.addCarver(GenerationStep.Carving.AIR, FrostConfiguredWorldCarvers.CAVE);
-		p_194721_.addCarver(GenerationStep.Carving.AIR, FrostConfiguredWorldCarvers.CAVE_EXTRA_UNDERGROUND);
-		p_194721_.addCarver(GenerationStep.Carving.AIR, FrostConfiguredWorldCarvers.CANYON);
+        p_194721_.addCarver(FrostConfiguredWorldCarvers.CAVE);
+        p_194721_.addCarver(FrostConfiguredWorldCarvers.CAVE_EXTRA_UNDERGROUND);
+        p_194721_.addCarver(FrostConfiguredWorldCarvers.CANYON);
 	}
 
 	public static void monsterSpawns(MobSpawnSettings.Builder p_126813_) {

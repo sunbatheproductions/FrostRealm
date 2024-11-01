@@ -3,9 +3,7 @@
   "category": "misc",
   "cookingtime": 100,
   "experience": 0.2,
-  "ingredient": {
-    "item": "frostrealm:astrium_raw"
-  },
+  "ingredient": "frostrealm:astrium_raw",
   "result": {
     "count": 1,
     "id": "frostrealm:astrium_ingot"

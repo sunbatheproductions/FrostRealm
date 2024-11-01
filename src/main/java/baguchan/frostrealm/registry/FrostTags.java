@@ -50,6 +50,12 @@ public class FrostTags {
 		public static final TagKey<Item> FROST_BOAR_FOODS = tag("frost_boar_foods");
 		public static final TagKey<Item> CRYSTAL_FOX_FOODS = tag("crystal_fox_foods");
 
+        public static final TagKey<Item> ASTRIUM_TOOL_MATERIAL = tag("astrium_tool_material");
+        public static final TagKey<Item> GLACINIUM_TOOL_MATERIAL = tag("glacinium_tool_material");
+        public static final TagKey<Item> RARE_TOOL_MATERIAL = tag("rare_tool_material");
+        public static final TagKey<Item> YETI_FUR_MATERIAL = tag("yeti_fur_material");
+        public static final TagKey<Item> BOAR_FUR_MATERIAL = tag("boar_fur_material");
+
 
 		private static TagKey<Item> tag(String p_203849_) {
 			return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, p_203849_));

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "building",
   "ingredients": [
-    {
-      "item": "frostrealm:rye_block"
-    }
+    "frostrealm:rye_block"
   ],
   "result": {
     "count": 9,

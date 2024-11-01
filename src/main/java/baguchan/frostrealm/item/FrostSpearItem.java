@@ -1,7 +1,7 @@
 package baguchan.frostrealm.item;
 
-import bagu_chan.bagus_lib.util.client.AnimationUtil;
 import baguchan.frostrealm.registry.FrostAnimations;
+import baguchi.bagus_lib.util.client.AnimationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -73,12 +73,6 @@ public class FrostSpearItem extends Item {
 
 		return true;
 	}
-
-	@Override
-	public int getEnchantmentValue() {
-		return 20;
-	}
-
 
 	@Override
 	public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {

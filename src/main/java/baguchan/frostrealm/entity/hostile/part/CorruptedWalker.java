@@ -48,7 +48,6 @@ public class CorruptedWalker extends Monster {
             Collections.addAll(parts, this.ec[i].getParts());
         }
 
-        this.noCulling = true;
         this.xpReward = 50;
         this.partArray = parts.toArray(new CorruptedWalkerPart[0]);
         this.setId(ENTITY_COUNTER.getAndAdd(this.partArray.length + 1) + 1); // Forge: Fix MC-158205: Make sure part ids are successors of parent mob id

@@ -74,7 +74,7 @@ public class SnowMole extends Animal {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 12.0D).add(Attributes.FOLLOW_RANGE, 20.0D).add(Attributes.STEP_HEIGHT, 1.0F).add(Attributes.MOVEMENT_SPEED, 0.24D);
 	}
 
-	public static boolean checkSnowMoleSpawnRules(EntityType<? extends Animal> p_27578_, LevelAccessor p_27579_, MobSpawnType p_27580_, BlockPos p_27581_, RandomSource p_27582_) {
+	public static boolean checkSnowMoleSpawnRules(EntityType<? extends Animal> p_27578_, LevelAccessor p_27579_, EntitySpawnReason p_27580_, BlockPos p_27581_, RandomSource p_27582_) {
 		return p_27579_.getBlockState(p_27581_.below()).is(Blocks.SNOW_BLOCK) && p_27579_.getBlockState(p_27581_).isAir();
 	}
 
@@ -85,6 +85,6 @@ public class SnowMole extends Animal {
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        return FrostEntities.SNOW_MOLE.get().create(p_146743_);
+		return FrostEntities.SNOW_MOLE.get().create(p_146743_, EntitySpawnReason.BREEDING);
     }
 }

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -11,7 +12,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -21,9 +22,7 @@ import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
@@ -31,7 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -49,7 +48,7 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 	protected static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 7.0D, 16.0D);
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	private static final VoxelShape VIRTUAL_FENCE_POST = Block.box(6.0D, 0.0D, 6.0D, 10.0D, 16.0D, 10.0D);
 
 	public FrostCampfireBlock(Properties p_49795_) {
@@ -58,25 +57,26 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 
 
 	@Override
-	public ItemInteractionResult useItemOn(ItemStack p_316304_, BlockState p_60503_, Level p_60504_, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
+	public InteractionResult useItemOn(ItemStack p_316304_, BlockState p_60503_, Level p_60504_, BlockPos p_60505_, Player p_60506_, InteractionHand p_60507_, BlockHitResult p_60508_) {
 		if (p_60503_.getValue(LIT) && p_60506_.getItemInHand(p_60507_).getItem() instanceof ShovelItem) {
 			dowse(p_60506_, p_60504_, p_60505_, p_60503_);
 			p_60504_.setBlock(p_60505_, p_60503_.setValue(BlockStateProperties.LIT, Boolean.valueOf(false)), 11);
 
 			p_60506_.awardStat(Stats.INTERACT_WITH_CAMPFIRE);
 			p_60506_.getItemInHand(p_60507_).hurtAndBreak(1, p_60506_, LivingEntity.getSlotForHand(p_60507_));
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 
 		if (!p_60503_.getValue(LIT) && p_60506_.getItemInHand(p_60507_).getItem() instanceof FlintAndSteelItem) {
 			p_60504_.setBlock(p_60505_, p_60503_.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
 			p_60506_.getItemInHand(p_60507_).hurtAndBreak(1, p_60506_, LivingEntity.getSlotForHand(p_60507_));
-			return ItemInteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 
 		return super.useItemOn(p_316304_, p_60503_, p_60504_, p_60505_, p_60506_, p_60507_, p_60508_);
 	}
 
+	@Override
 	public void entityInside(BlockState p_51269_, Level p_51270_, BlockPos p_51271_, Entity p_51272_) {
 		if (p_51269_.getValue(LIT) && p_51272_ instanceof LivingEntity) {
 			p_51272_.hurt(p_51272_.damageSources().freeze(), 2.0F);
@@ -85,6 +85,7 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 		super.entityInside(p_51269_, p_51270_, p_51271_, p_51272_);
 	}
 
+	@Override
 	public void onRemove(BlockState p_51281_, Level p_51282_, BlockPos p_51283_, BlockState p_51284_, boolean p_51285_) {
 		if (!p_51281_.is(p_51284_.getBlock())) {
 			BlockEntity blockentity = p_51282_.getBlockEntity(p_51283_);
@@ -97,6 +98,7 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 	}
 
 	@Nullable
+	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext p_51240_) {
 		LevelAccessor levelaccessor = p_51240_.getLevel();
 		BlockPos blockpos = p_51240_.getClickedPos();
@@ -104,22 +106,26 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 		return this.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(flag)).setValue(LIT, Boolean.valueOf(!flag)).setValue(FACING, p_51240_.getHorizontalDirection());
 	}
 
-	public BlockState updateShape(BlockState p_51298_, Direction p_51299_, BlockState p_51300_, LevelAccessor p_51301_, BlockPos p_51302_, BlockPos p_51303_) {
-		if (p_51298_.getValue(WATERLOGGED)) {
-			p_51301_.scheduleTick(p_51302_, Fluids.WATER, Fluids.WATER.getTickDelay(p_51301_));
+	@Override
+	protected BlockState updateShape(BlockState p_51298_, LevelReader p_374562_, ScheduledTickAccess p_374439_, BlockPos p_51302_, Direction p_51299_, BlockPos p_51303_, BlockState p_51300_, RandomSource p_374147_) {
+		if ((Boolean) p_51298_.getValue(WATERLOGGED)) {
+			p_374439_.scheduleTick(p_51302_, Fluids.WATER, Fluids.WATER.getTickDelay(p_374562_));
 		}
 
-		return p_51299_ == Direction.DOWN ? p_51298_ : super.updateShape(p_51298_, p_51299_, p_51300_, p_51301_, p_51302_, p_51303_);
+		return p_51299_ == Direction.DOWN ? (BlockState) p_51298_ : super.updateShape(p_51298_, p_374562_, p_374439_, p_51302_, p_51299_, p_51303_, p_51300_, p_374147_);
 	}
 
+	@Override
 	public VoxelShape getShape(BlockState p_51309_, BlockGetter p_51310_, BlockPos p_51311_, CollisionContext p_51312_) {
 		return SHAPE;
 	}
 
+	@Override
 	public RenderShape getRenderShape(BlockState p_51307_) {
 		return RenderShape.MODEL;
 	}
 
+	@Override
 	public void animateTick(BlockState p_220918_, Level p_220919_, BlockPos p_220920_, RandomSource p_220921_) {
 		if (p_220918_.getValue(LIT)) {
 			if (p_220921_.nextInt(10) == 0) {
@@ -157,12 +163,14 @@ public class FrostCampfireBlock extends Block implements SimpleWaterloggedBlock 
 		}
 	}
 
+	@Override
 	public void onProjectileHit(Level p_51244_, BlockState p_51245_, BlockHitResult p_51246_, Projectile p_51247_) {
 		BlockPos blockpos = p_51246_.getBlockPos();
-		if (!p_51244_.isClientSide && p_51247_.isOnFire() && p_51247_.mayInteract(p_51244_, blockpos) && !p_51245_.getValue(LIT) && !p_51245_.getValue(WATERLOGGED)) {
-			p_51244_.setBlock(blockpos, p_51245_.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
+		if (p_51244_ instanceof ServerLevel serverLevel) {
+			if (!p_51244_.isClientSide && p_51247_.isOnFire() && p_51247_.mayInteract(serverLevel, blockpos) && !p_51245_.getValue(LIT) && !p_51245_.getValue(WATERLOGGED)) {
+				p_51244_.setBlock(blockpos, p_51245_.setValue(BlockStateProperties.LIT, Boolean.valueOf(true)), 11);
+			}
 		}
-
 	}
 
 	public static void makeParticles(Level p_51252_, BlockPos p_51253_) {

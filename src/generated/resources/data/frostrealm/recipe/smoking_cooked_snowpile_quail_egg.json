@@ -3,9 +3,7 @@
   "category": "food",
   "cookingtime": 100,
   "experience": 0.2,
-  "ingredient": {
-    "item": "frostrealm:snowpile_quail_egg"
-  },
+  "ingredient": "frostrealm:snowpile_quail_egg",
   "result": {
     "count": 1,
     "id": "frostrealm:cooked_snowpile_quail_egg"

@@ -18,7 +18,7 @@ public class FrostDataMaps extends DataMapProvider {
     }
 
     @Override
-    protected void gather() {
+    protected void gather(HolderLookup.Provider provider) {
         var compostables = this.builder(NeoForgeDataMaps.COMPOSTABLES);
         this.addCompostable(compostables, FrostItems.RYE_BREAD.get(), 0.6F);
         this.addCompostable(compostables, FrostItems.RYE.get(), 0.5F);

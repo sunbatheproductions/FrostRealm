@@ -5,13 +5,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.10.4
 
 import baguchan.frostrealm.client.animation.BabyAnimations;
 import baguchan.frostrealm.client.animation.WolfflueAnimations;
-import baguchan.frostrealm.entity.animal.Wolfflue;
-import net.minecraft.client.model.AgeableHierarchicalModel;
+import baguchan.frostrealm.client.render.state.WolfflueRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class WolfflueModel<T extends Wolfflue> extends AgeableHierarchicalModel<T> {
+public class WolfflueModel<T extends WolfflueRenderState> extends EntityModel<T> {
     public final ModelPart all;
     public final ModelPart head;
     private final ModelPart body;
@@ -24,7 +24,7 @@ public class WolfflueModel<T extends Wolfflue> extends AgeableHierarchicalModel<
     private final ModelPart leftLeg3;
 
     public WolfflueModel(ModelPart root) {
-        super(0.5F, 24.0F);
+        super(root);
         this.all = root.getChild("all");
         this.head = this.all.getChild("head");
         this.body = this.all.getChild("body");
@@ -75,44 +75,32 @@ public class WolfflueModel<T extends Wolfflue> extends AgeableHierarchicalModel<
     }
 
     @Override
-    public void prepareMobModel(T entity, float p_102615_, float p_102616_, float p_102617_) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        super.prepareMobModel(entity, p_102615_, p_102616_, p_102617_);
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
+        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+        this.tail.xRot = entity.tailAngle;
+        this.head.zRot = entity.headRollAngle;
+        float f = entity.partialTick;
 
-        this.head.zRot = entity.getHeadRollAngle(p_102617_);
-    }
-
-    @Override
-    public void setupAnim(Wolfflue entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F);
-        this.tail.xRot = entity.getTailAngle();
-
-        float f = ageInTicks - (float) entity.tickCount;
-
-        if (entity.isInSittingPose()) {
+        if (entity.isSitting) {
             if (entity.idleSitAnimationState.isStarted() || entity.idleSit2AnimationState.isStarted()) {
-                this.animate(entity.idleSitAnimationState, WolfflueAnimations.sit_idle, ageInTicks);
-                this.animate(entity.idleSit2AnimationState, WolfflueAnimations.sit_idle2, ageInTicks);
+                this.animate(entity.idleSitAnimationState, WolfflueAnimations.sit_idle, entity.ageInTicks);
+                this.animate(entity.idleSit2AnimationState, WolfflueAnimations.sit_idle2, entity.ageInTicks);
             } else {
                 this.applyStatic(WolfflueAnimations.sit);
             }
         } else {
             if (entity.jumpAnimationState.isStarted()) {
-                this.animate(entity.jumpAnimationState, WolfflueAnimations.jump, ageInTicks);
+                this.animate(entity.jumpAnimationState, WolfflueAnimations.jump, entity.ageInTicks);
             } else {
-                this.animateWalk(WolfflueAnimations.run, limbSwing, limbSwingAmount * (entity.getRunningScale(f)), 1.0F, 2.5F);
-                this.animateWalk(WolfflueAnimations.walk, limbSwing, limbSwingAmount * (1.0F - entity.getRunningScale(f)), 1.0F, 5.0F);
+                this.animateWalk(WolfflueAnimations.run, entity.walkAnimationPos, entity.walkAnimationSpeed * (entity.running), 1.0F, 2.5F);
+                this.animateWalk(WolfflueAnimations.walk, entity.walkAnimationPos, entity.walkAnimationSpeed * (1.0F - entity.running), 1.0F, 5.0F);
             }
         }
 
-        if (this.young) {
+        if (entity.isBaby) {
             this.applyStatic(BabyAnimations.baby);
         }
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.all;
     }
 }

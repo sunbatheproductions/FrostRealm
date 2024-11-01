@@ -4,13 +4,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.10.4
 
 
 import baguchan.frostrealm.client.animation.VenochemAnimation;
-import baguchan.frostrealm.entity.hostile.Venochem;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.VenochemRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class VenochemModel<T extends Venochem> extends HierarchicalModel<T> {
+public class VenochemModel<T extends VenochemRenderState> extends EntityModel<T> {
     private final ModelPart root;
     private final ModelPart body;
     private final ModelPart leg;
@@ -25,6 +25,7 @@ public class VenochemModel<T extends Venochem> extends HierarchicalModel<T> {
     private final ModelPart tail2;
 
     public VenochemModel(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.body = this.root.getChild("body");
         this.leg = this.body.getChild("leg");
@@ -72,19 +73,15 @@ public class VenochemModel<T extends Venochem> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(Venochem entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.head.xRot = headPitch * ((float) Math.PI / 180F);
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
+        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
 
-        this.animate(entity.attackAnimationState, VenochemAnimation.attack, ageInTicks);
-        this.animate(entity.shootAnimationState, VenochemAnimation.spit, ageInTicks);
+        this.animate(entity.attackAnimationState, VenochemAnimation.attack, entity.ageInTicks);
+        this.animate(entity.shootAnimationState, VenochemAnimation.spit, entity.ageInTicks);
 
-        this.animateWalk(VenochemAnimation.walk, limbSwing, limbSwingAmount, 4.0F, 3.0F);
+        this.animateWalk(VenochemAnimation.walk, entity.walkAnimationPos, entity.walkAnimationSpeed, 4.0F, 3.0F);
     }
 
-    @Override
-    public ModelPart root() {
-        return this.root;
-    }
 }

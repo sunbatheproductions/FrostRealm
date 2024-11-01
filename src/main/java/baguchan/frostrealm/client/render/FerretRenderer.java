@@ -4,12 +4,13 @@ import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.FerretModel;
 import baguchan.frostrealm.client.render.layer.FerretCollarLayer;
+import baguchan.frostrealm.client.render.state.FerretRenderState;
 import baguchan.frostrealm.entity.animal.Ferret;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public class FerretRenderer<T extends Ferret> extends MobRenderer<T, FerretModel<T>> {
+public class FerretRenderer<T extends Ferret> extends MobRenderer<T, FerretRenderState, FerretModel<FerretRenderState>> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/ferret/ferret.png");
 
     public FerretRenderer(EntityRendererProvider.Context p_173952_) {
@@ -18,7 +19,20 @@ public class FerretRenderer<T extends Ferret> extends MobRenderer<T, FerretModel
     }
 
     @Override
-    public ResourceLocation getTextureLocation(T entity) {
+    public void extractRenderState(T p_362733_, FerretRenderState p_360515_, float p_361157_) {
+        super.extractRenderState(p_362733_, p_360515_, p_361157_);
+        p_360515_.running = p_362733_.getRunningScale(p_361157_);
+        p_360515_.collarColor = p_362733_.isTame() ? p_362733_.getCollarColor() : null;
+        p_360515_.isSitting = p_362733_.isInSittingPose();
+    }
+
+    @Override
+    public FerretRenderState createRenderState() {
+        return new FerretRenderState();
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(FerretRenderState entity) {
         return TEXTURE;
     }
 }

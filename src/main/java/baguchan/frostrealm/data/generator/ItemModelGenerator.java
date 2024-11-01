@@ -107,7 +107,6 @@ public class ItemModelGenerator extends ItemModelProvider {
 		this.egg(FrostItems.FERRET_SPAWNEGG);
 		this.egg(FrostItems.SEAL_SPAWNEGG);
 		this.egg(FrostItems.STRAY_WARRIOR_SPAWNEGG);
-        this.egg(FrostItems.MIND_VINE_SPAWNEGG);
 		this.egg(FrostItems.VENOCHEM_SPAWNEGG);
 		this.egg(FrostItems.GOKKUR_SPAWNEGG);
 

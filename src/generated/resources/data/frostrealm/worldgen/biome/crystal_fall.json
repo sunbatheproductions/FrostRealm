@@ -1,11 +1,9 @@
 {
-  "carvers": {
-    "air": [
-      "frostrealm:frostrealm_cave",
-      "frostrealm:frostrealm_cave_extra_underground",
-      "frostrealm:frostrealm_canyon"
-    ]
-  },
+  "carvers": [
+    "frostrealm:frostrealm_cave",
+    "frostrealm:frostrealm_cave_extra_underground",
+    "frostrealm:frostrealm_canyon"
+  ],
   "downfall": 0.8,
   "effects": {
     "fog_color": 4630224,

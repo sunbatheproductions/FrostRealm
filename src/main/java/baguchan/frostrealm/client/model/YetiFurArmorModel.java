@@ -3,15 +3,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.1.3
 // Paste this class into your mod and generate all required imports
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
-public class YetiFurArmorModel<T extends LivingEntity> extends HumanoidModel<T> {
+public class YetiFurArmorModel<T extends HumanoidRenderState> extends HumanoidModel<T> {
 	public YetiFurArmorModel(ModelPart root) {
 		super(root);
 	}
@@ -37,17 +35,7 @@ public class YetiFurArmorModel<T extends LivingEntity> extends HumanoidModel<T> 
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity) {
 
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-		head.render(poseStack, buffer, packedLight, packedOverlay, color);
-		body.render(poseStack, buffer, packedLight, packedOverlay, color);
-		leftArm.render(poseStack, buffer, packedLight, packedOverlay, color);
-		rightArm.render(poseStack, buffer, packedLight, packedOverlay, color);
-		leftLeg.render(poseStack, buffer, packedLight, packedOverlay, color);
-		rightLeg.render(poseStack, buffer, packedLight, packedOverlay, color);
 	}
 }

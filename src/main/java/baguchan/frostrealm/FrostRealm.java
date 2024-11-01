@@ -68,7 +68,6 @@ public class FrostRealm {
 		FrostEntities.ENTITIES.register(modBus);
 		FrostCreativeTabs.CREATIVE_MODE_TABS.register(modBus);
 		FrostItems.ITEMS.register(modBus);
-		FrostArmorMaterials.ARMOR_MATERIALS.register(modBus);
 		FrostLootFunctions.LOOT_REIGSTER.register(modBus);
 		FrostEffects.MOB_EFFECTS.register(modBus);
 		FrostEffects.POTION.register(modBus);

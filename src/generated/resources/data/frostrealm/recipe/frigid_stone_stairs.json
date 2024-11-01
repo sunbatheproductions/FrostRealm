@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "M": {
-      "item": "frostrealm:frigid_stone"
-    }
+    "M": "frostrealm:frigid_stone"
   },
   "pattern": [
     "M  ",

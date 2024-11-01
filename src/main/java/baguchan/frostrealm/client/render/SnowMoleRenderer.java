@@ -7,12 +7,13 @@ import baguchan.frostrealm.entity.animal.SnowMole;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class SnowMoleRenderer<T extends SnowMole> extends MobRenderer<T, SnowMoleModel<T>> {
+public class SnowMoleRenderer<T extends SnowMole> extends MobRenderer<T, LivingEntityRenderState, SnowMoleModel<LivingEntityRenderState>> {
 	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/snow_mole.png");
 
 	public SnowMoleRenderer(EntityRendererProvider.Context p_173952_) {
@@ -20,13 +21,18 @@ public class SnowMoleRenderer<T extends SnowMole> extends MobRenderer<T, SnowMol
 	}
 
 	@Override
-	protected void scale(T p_115314_, PoseStack p_115315_, float p_115316_) {
-		p_115315_.scale(p_115314_.getAgeScale(), p_115314_.getAgeScale(), p_115314_.getAgeScale());
-		super.scale(p_115314_, p_115315_, p_115316_);
+	protected void scale(LivingEntityRenderState p_115314_, PoseStack p_115315_) {
+		p_115315_.scale(p_115314_.ageScale, p_115314_.ageScale, p_115314_.ageScale);
+		super.scale(p_115314_, p_115315_);
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(T p_110775_1_) {
+	public LivingEntityRenderState createRenderState() {
+		return new LivingEntityRenderState();
+	}
+
+	@Override
+	public ResourceLocation getTextureLocation(LivingEntityRenderState p_110775_1_) {
 		return TEXTURE;
 	}
 }

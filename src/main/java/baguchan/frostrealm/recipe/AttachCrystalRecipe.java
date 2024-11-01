@@ -3,7 +3,6 @@ package baguchan.frostrealm.recipe;
 import baguchan.frostrealm.api.recipe.AttachableCrystal;
 import baguchan.frostrealm.data.resource.registries.AttachableCrystals;
 import baguchan.frostrealm.registry.FrostDataCompnents;
-import baguchan.frostrealm.registry.FrostItems;
 import baguchan.frostrealm.registry.FrostRecipes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -12,20 +11,18 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SmithingRecipe;
-import net.minecraft.world.item.crafting.SmithingRecipeInput;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class AttachCrystalRecipe implements SmithingRecipe {
     final Ingredient base;
     final Ingredient addition;
-
+    @Nullable
+    private PlacementInfo placementInfo;
     public AttachCrystalRecipe(Ingredient p_266787_, Ingredient p_267292_) {
         this.base = p_266787_;
         this.addition = p_267292_;
@@ -33,6 +30,21 @@ public class AttachCrystalRecipe implements SmithingRecipe {
 
     public boolean matches(SmithingRecipeInput p_346359_, Level p_266781_) {
         return this.base.test(p_346359_.base()) && this.addition.test(p_346359_.template());
+    }
+
+    @Override
+    public Optional<Ingredient> templateIngredient() {
+        return Optional.of(this.addition);
+    }
+
+    @Override
+    public Optional<Ingredient> baseIngredient() {
+        return Optional.of(this.base);
+    }
+
+    @Override
+    public Optional<Ingredient> additionIngredient() {
+        return Optional.empty();
     }
 
     public ItemStack assemble(SmithingRecipeInput p_345750_, HolderLookup.Provider p_335536_) {
@@ -54,40 +66,19 @@ public class AttachCrystalRecipe implements SmithingRecipe {
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider p_335445_) {
-        ItemStack itemstack = new ItemStack(Items.IRON_SWORD);
-        Optional<Holder.Reference<AttachableCrystal>> optional1 = AttachableCrystals.getFromIngredient(p_335445_, FrostItems.UNSTABLE_VENOM_CRYSTAL.get().getDefaultInstance());
-        if (optional1.isPresent()) {
-            itemstack.set(FrostDataCompnents.ATTACH_CRYSTAL.get(), optional1.get());
-        }
-
-        return itemstack;
-    }
 
     @Override
-    public boolean isTemplateIngredient(ItemStack p_267113_) {
-        return this.addition.test(p_267113_);
-    }
-
-    @Override
-    public boolean isBaseIngredient(ItemStack p_267276_) {
-        return this.base.test(p_267276_);
-    }
-
-    @Override
-    public boolean isAdditionIngredient(ItemStack p_267260_) {
-        return true;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends SmithingRecipe> getSerializer() {
         return FrostRecipes.RECIPE_ATTACH.get();
     }
 
     @Override
-    public boolean isIncomplete() {
-        return Stream.of(this.base, this.addition).anyMatch(Ingredient::hasNoItems);
+    public PlacementInfo placementInfo() {
+        if (this.placementInfo == null) {
+            this.placementInfo = PlacementInfo.create(List.of(this.base, this.addition));
+        }
+
+        return this.placementInfo;
     }
 
     public static class Serializer implements RecipeSerializer<AttachCrystalRecipe> {

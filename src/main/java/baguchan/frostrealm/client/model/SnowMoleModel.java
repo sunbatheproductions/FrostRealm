@@ -3,20 +3,21 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.4.1
 // Paste this class into your mod and generate all required imports
 
 
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 
-public class SnowMoleModel<T extends Entity> extends HierarchicalModel<T> {
+public class SnowMoleModel<T extends LivingEntityRenderState> extends EntityModel<T> {
 	private final ModelPart root;
 	private final ModelPart handR;
 	private final ModelPart handL;
 
 	public SnowMoleModel(ModelPart root) {
-		this.root = root.getChild("root");
+        super(root);
+        this.root = root.getChild("root");
 		this.handR = this.root.getChild("handR");
 		this.handL = this.root.getChild("handL");
 	}
@@ -39,16 +40,12 @@ public class SnowMoleModel<T extends Entity> extends HierarchicalModel<T> {
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.root.xRot = headPitch * ((float) Math.PI / 180F);
-		this.root.yRot = netHeadYaw * ((float) Math.PI / 180F);
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
+        this.root.xRot = entity.yRot * ((float) Math.PI / 180F);
+        this.root.yRot = entity.xRot * ((float) Math.PI / 180F);
 
-		this.handR.zRot = Mth.cos(limbSwing * 0.6662F * 0.6F) * 1.25F * limbSwingAmount;
-		this.handL.zRot = Mth.cos(limbSwing * 0.6662F * 0.6F + (float) Math.PI) * 1.25F * limbSwingAmount;
-	}
-
-	@Override
-	public ModelPart root() {
-		return this.root;
+        this.handR.zRot = Mth.cos(entity.walkAnimationPos * 0.6662F * 0.6F) * 1.25F * entity.walkAnimationSpeed;
+        this.handL.zRot = Mth.cos(entity.walkAnimationPos * 0.6662F * 0.6F + (float) Math.PI) * 1.25F * entity.walkAnimationSpeed;
 	}
 }

@@ -4,6 +4,7 @@ import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.CrystalFoxModel;
 import baguchan.frostrealm.client.render.layer.CrystalFoxHeldItemLayer;
+import baguchan.frostrealm.client.render.state.CrystalFoxRenderState;
 import baguchan.frostrealm.entity.animal.CrystalFox;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -16,7 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class CrystalFoxRenderer extends MobRenderer<CrystalFox, CrystalFoxModel<CrystalFox>> {
+public class CrystalFoxRenderer extends MobRenderer<CrystalFox, CrystalFoxRenderState, CrystalFoxModel<CrystalFoxRenderState>> {
 	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/crystal_fox/crystal_fox.png");
 	private static final ResourceLocation SHEARED_TEXTURE = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/crystal_fox/crystal_fox_sheared.png");
 
@@ -27,9 +28,9 @@ public class CrystalFoxRenderer extends MobRenderer<CrystalFox, CrystalFoxModel<
 		super(p_173952_, new CrystalFoxModel<>(p_173952_.bakeLayer(FrostModelLayers.CRYSTAL_FOX)), 0.5F);
 		this.addLayer(new EyesLayer<>(this) {
 			@Override
-			public void render(PoseStack p_116983_, MultiBufferSource p_116984_, int p_116985_, CrystalFox p_116986_, float p_116987_, float p_116988_, float p_116989_, float p_116990_, float p_116991_, float p_116992_) {
-				if (p_116986_.isShearableWithoutConditions()) {
-					super.render(p_116983_, p_116984_, p_116985_, p_116986_, p_116987_, p_116988_, p_116989_, p_116990_, p_116991_, p_116992_);
+			public void render(PoseStack p_116983_, MultiBufferSource p_116984_, int p_116985_, CrystalFoxRenderState p_363277_, float p_116987_, float p_116988_) {
+				if (p_363277_.shearable) {
+					super.render(p_116983_, p_116984_, p_116985_, p_363277_, p_116987_, p_116988_);
 				}
 			}
 
@@ -44,17 +45,29 @@ public class CrystalFoxRenderer extends MobRenderer<CrystalFox, CrystalFoxModel<
 				return FOX_EYES_GLOW;
 			}
 		});
-		this.addLayer(new CrystalFoxHeldItemLayer(this, p_173952_.getItemInHandRenderer()));
+		this.addLayer(new CrystalFoxHeldItemLayer(this, p_173952_.getItemRenderer()));
 	}
 
 	@Override
-	protected void scale(CrystalFox p_115314_, PoseStack p_115315_, float p_115316_) {
-		p_115315_.scale(p_115314_.getAgeScale(), p_115314_.getAgeScale(), p_115314_.getAgeScale());
-		super.scale(p_115314_, p_115315_, p_115316_);
+	public void extractRenderState(CrystalFox p_364137_, CrystalFoxRenderState p_365146_, float p_361192_) {
+		super.extractRenderState(p_364137_, p_365146_, p_361192_);
+		p_365146_.eatAnimationState.copyFrom(p_364137_.eatAnimationState);
+		p_365146_.shearable = p_364137_.isShearableWithoutConditions();
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(CrystalFox p_110775_1_) {
-		return p_110775_1_.isShearableWithoutConditions() ? TEXTURE : SHEARED_TEXTURE;
+	public CrystalFoxRenderState createRenderState() {
+		return new CrystalFoxRenderState();
+	}
+
+	@Override
+	protected void scale(CrystalFoxRenderState p_115314_, PoseStack p_115315_) {
+		p_115315_.scale(p_115314_.ageScale, p_115314_.ageScale, p_115314_.ageScale);
+		super.scale(p_115314_, p_115315_);
+	}
+
+	@Override
+	public ResourceLocation getTextureLocation(CrystalFoxRenderState p_110775_1_) {
+		return p_110775_1_.shearable ? TEXTURE : SHEARED_TEXTURE;
 	}
 }

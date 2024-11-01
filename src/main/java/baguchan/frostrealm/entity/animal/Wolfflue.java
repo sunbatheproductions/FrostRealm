@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -136,7 +137,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers());
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
-        this.targetSelector.addGoal(5, new NonTameRandomTargetGoal<>(this, Animal.class, false, PREY_SELECTOR).setUnseenMemoryTicks(300));
+        this.targetSelector.addGoal(5, new NonTameRandomTargetGoal<>(this, Animal.class, false, (living, serverLevel) -> PREY_SELECTOR.test(living)).setUnseenMemoryTicks(300));
         this.targetSelector.addGoal(8, new ResetUniversalAngerTargetGoal<>(this, true));
     }
 
@@ -218,8 +219,8 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
         p_326027_.define(DATA_COLLAR_COLOR, DyeColor.RED.getId());
         p_326027_.define(DATA_REMAINING_ANGER_TIME, 0);
         RegistryAccess registryaccess = this.registryAccess();
-        Registry<WolfflueVariant> registry = registryaccess.registryOrThrow(WolfflueVariants.WOLFFLUE_VARIANT_REGISTRY_KEY);
-        p_326027_.define(DATA_VARIANT_ID, registry.getHolder(WolfflueVariants.DEFAULT).or(registry::getAny).orElseThrow());
+        Registry<WolfflueVariant> registry = registryaccess.lookupOrThrow(WolfflueVariants.WOLFFLUE_VARIANT_REGISTRY_KEY);
+        p_326027_.define(DATA_VARIANT_ID, registry.get(WolfflueVariants.DEFAULT).or(registry::getAny).orElseThrow());
 
     }
 
@@ -264,7 +265,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
         Optional.ofNullable(ResourceLocation.tryParse(p_30402_.getString("variant")))
                 .map(p_332608_ -> ResourceKey.create(WolfflueVariants.WOLFFLUE_VARIANT_REGISTRY_KEY, p_332608_))
-                .flatMap(p_352803_ -> this.registryAccess().registryOrThrow(WolfflueVariants.WOLFFLUE_VARIANT_REGISTRY_KEY).getHolder((ResourceKey<WolfflueVariant>) p_352803_))
+                .flatMap(p_352803_ -> this.registryAccess().lookupOrThrow(WolfflueVariants.WOLFFLUE_VARIANT_REGISTRY_KEY).get((ResourceKey<WolfflueVariant>) p_352803_))
                 .ifPresent(this::setVariant);
 
         this.readPersistentAngerSaveData(this.level(), p_30402_);
@@ -272,7 +273,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, EntitySpawnReason mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
 
         Holder<Biome> holder = serverLevelAccessor.getBiome(this.blockPosition());
         Holder<WolfflueVariant> holder1;
@@ -347,7 +348,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
             ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
             if (this.isFood(itemstack)) {
                 if (this.ticksSinceEaten > 600) {
-                    FoodProperties foodproperties = itemstack.getFoodProperties(this);
+                    FoodProperties foodproperties = itemstack.get(DataComponents.FOOD);
                     float f = foodproperties != null ? (float) foodproperties.nutrition() : 1.0F;
                     this.heal(f);
                     ItemStack itemstack1 = itemstack.finishUsingItem(this.level(), this);
@@ -358,7 +359,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
                     this.ticksSinceEaten = 0;
                 } else if (this.ticksSinceEaten > 560 && this.ticksSinceEaten % 5 == 0) {
-                    this.playSound(this.getEatingSound(itemstack), 1.0F, 1.0F);
+                    this.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
                     this.level().broadcastEntityEvent(this, (byte) 45);
                 }
             }
@@ -372,7 +373,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     @Override
-    protected void pickUpItem(ItemEntity p_28514_) {
+    protected void pickUpItem(ServerLevel serverLevel, ItemEntity p_28514_) {
         ItemStack itemstack = p_28514_.getItem();
         if (this.canHoldItem(itemstack)) {
             int i = itemstack.getCount();
@@ -424,20 +425,20 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     @Override
-    public boolean hurt(DamageSource p_30386_, float p_30387_) {
-        if (this.isInvulnerableTo(p_30386_)) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource p_30386_, float p_30387_) {
+        if (this.isInvulnerableTo(serverLevel, p_30386_)) {
             return false;
         } else {
             if (!this.level().isClientSide) {
                 this.setOrderedToSit(false);
             }
 
-            return super.hurt(p_30386_, p_30387_);
+            return super.hurtServer(serverLevel, p_30386_, p_30387_);
         }
     }
 
     @Override
-    public boolean doHurtTarget(Entity p_21372_) {
+    public boolean doHurtTarget(ServerLevel serverLevel, Entity p_21372_) {
         float f = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
         DamageSource damagesource = this.damageSources().mobAttack(this);
         if (this.level() instanceof ServerLevel serverlevel) {
@@ -447,7 +448,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
             }
         }
 
-        boolean flag = p_21372_.hurt(damagesource, f);
+        boolean flag = p_21372_.hurtServer(serverLevel, damagesource, f);
         if (flag) {
             float f1 = this.getKnockback(p_21372_, damagesource);
             if (f1 > 0.0F && p_21372_ instanceof LivingEntity livingentity) {
@@ -477,9 +478,9 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     @Override
-    protected void actuallyHurt(DamageSource p_331935_, float p_330695_) {
+    protected void actuallyHurt(ServerLevel serverLevel, DamageSource p_331935_, float p_330695_) {
         if (!this.canArmorAbsorb(p_331935_)) {
-            super.actuallyHurt(p_331935_, p_330695_);
+            super.actuallyHurt(serverLevel, p_331935_, p_330695_);
         } else {
             ItemStack itemstack = this.getBodyArmorItem();
             int i = itemstack.getDamageValue();
@@ -530,12 +531,12 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
         if (!this.level().isClientSide || this.isBaby() && this.isFood(itemstack)) {
             if (this.isTame()) {
                 if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
-                    FoodProperties foodproperties = itemstack.getFoodProperties(this);
+                    FoodProperties foodproperties = itemstack.get(DataComponents.FOOD);
                     float f = foodproperties != null ? (float) foodproperties.nutrition() : 1.0F;
                     this.heal(4.0F * f);
                     itemstack.consume(1, p_30412_);
                     this.gameEvent(GameEvent.EAT); // Neo: add EAT game event
-                    return InteractionResult.sidedSuccess(this.level().isClientSide());
+                    return InteractionResult.SUCCESS_SERVER;
                 } else {
                     if (item instanceof DyeItem dyeitem && this.isOwnedBy(p_30412_)) {
                         DyeColor dyecolor = dyeitem.getDyeColor();
@@ -559,7 +560,9 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                     if (itemstack.isEmpty() && p_30412_.isShiftKeyDown() && this.isOwnedBy(p_30412_) && !this.getMainHandItem().isEmpty()) {
                         ItemStack itemstack1 = this.getMainHandItem();
                         this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-                        this.spawnAtLocation(itemstack1);
+                        if (this.level() instanceof ServerLevel serverLevel) {
+                            this.spawnAtLocation(serverLevel, itemstack1);
+                        }
                         return InteractionResult.SUCCESS;
                     }
 
@@ -576,7 +579,9 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                         this.playSound(SoundEvents.ARMOR_UNEQUIP_WOLF);
                         ItemStack itemstack1 = this.getBodyArmorItem();
                         this.setBodyArmorItem(ItemStack.EMPTY);
-                        this.spawnAtLocation(itemstack1);
+                        if (this.level() instanceof ServerLevel serverLevel) {
+                            this.spawnAtLocation(serverLevel, itemstack1);
+                        }
                         return InteractionResult.SUCCESS;
                     } else {
                     InteractionResult interactionresult = super.mobInteract(p_30412_, p_30413_);
@@ -585,7 +590,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                         this.jumping = false;
                         this.navigation.stop();
                         this.setTarget(null);
-                        return InteractionResult.SUCCESS_NO_ITEM_USED;
+                        return InteractionResult.TRY_WITH_EMPTY_HAND;
                     } else {
                         return interactionresult;
                     }
@@ -691,7 +696,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
     @Nullable
     public Wolfflue getBreedOffspring(ServerLevel p_149088_, AgeableMob p_149089_) {
-        Wolfflue wolf = FrostEntities.WOLFFLUE.get().create(p_149088_);
+        Wolfflue wolf = FrostEntities.WOLFFLUE.get().create(p_149088_, EntitySpawnReason.BREEDING);
         if (wolf != null && p_149089_ instanceof Wolfflue wolf1) {
             if (this.random.nextBoolean()) {
                 wolf.setVariant(this.getVariant());
@@ -765,7 +770,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     public static boolean checkWolfSpawnRules(
-            EntityType<Wolfflue> p_218292_, LevelAccessor p_218293_, MobSpawnType p_218294_, BlockPos p_218295_, RandomSource p_218296_
+            EntityType<Wolfflue> p_218292_, LevelAccessor p_218293_, EntitySpawnReason p_218294_, BlockPos p_218295_, RandomSource p_218296_
     ) {
         return p_218293_.getBlockState(p_218295_.below()).is(FrostTags.Blocks.ANIMAL_SPAWNABLE) && isBrightEnoughToSpawn(p_218293_, p_218295_);
     }

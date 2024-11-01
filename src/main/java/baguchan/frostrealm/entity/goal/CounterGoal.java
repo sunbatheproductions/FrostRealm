@@ -62,7 +62,7 @@ public class CounterGoal extends Goal {
     protected void checkAndPerformAttack(LivingEntity p_29589_) {
         if (this.ticksUntilNextAttack == this.leftActionPoint) {
             if (this.canPerformAttack(p_29589_)) {
-                this.attacker.doHurtTarget(p_29589_);
+                this.attacker.doHurtTarget(getServerLevel(this.attacker), p_29589_);
             }
         } else if (this.canPerformAttack(p_29589_)) {
             if (this.ticksUntilNextAttack == this.attackLengh) {

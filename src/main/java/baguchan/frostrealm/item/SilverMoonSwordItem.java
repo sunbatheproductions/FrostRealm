@@ -1,5 +1,6 @@
 package baguchan.frostrealm.item;
 
+import baguchan.frostrealm.registry.FrostToolMaterials;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -7,14 +8,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
 public class SilverMoonSwordItem extends SwordItem {
-    public SilverMoonSwordItem(Tier p_43269_, Properties p_43272_) {
-        super(p_43269_, p_43272_);
+    public SilverMoonSwordItem(FrostToolMaterials.FrostToolMaterial toolMaterial, float p_362481_, float p_364182_, Properties p_43272_) {
+        super(toolMaterial.applySwordProperties(p_43272_, p_362481_, p_364182_));
     }
 
 

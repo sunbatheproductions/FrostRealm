@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "M": {
-      "item": "frostrealm:sherbet_sandstone"
-    }
+    "M": "frostrealm:sherbet_sandstone"
   },
   "pattern": [
     "M  ",

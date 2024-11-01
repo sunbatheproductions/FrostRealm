@@ -3,7 +3,6 @@ package baguchan.frostrealm.client.event;
 import baguchan.frostrealm.capability.FrostWeatherManager;
 import baguchan.frostrealm.registry.FrostDimensions;
 import com.mojang.blaze3d.shaders.FogShape;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
@@ -36,8 +35,6 @@ public class ClientFogEvent {
 
                 event.setNearPlaneDistance(near);
                 event.setFarPlaneDistance(far);
-                RenderSystem.setShaderFogStart(event.getNearPlaneDistance());
-                RenderSystem.setShaderFogEnd(event.getFarPlaneDistance());
                 event.setFogShape(FogShape.SPHERE);
                 event.setCanceled(true);
             }

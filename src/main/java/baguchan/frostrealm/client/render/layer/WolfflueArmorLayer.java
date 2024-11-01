@@ -2,7 +2,8 @@ package baguchan.frostrealm.client.render.layer;
 
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.WolfflueModel;
-import baguchan.frostrealm.entity.animal.Wolfflue;
+import baguchan.frostrealm.client.render.state.WolfflueRenderState;
+import baguchan.frostrealm.item.WolfflueArmorItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -12,16 +13,12 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.Crackiness;
-import net.minecraft.world.item.AnimalArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.DyedItemColor;
 
 import java.util.Map;
 
-public class WolfflueArmorLayer<T extends Wolfflue> extends RenderLayer<T, WolfflueModel<T>> {
+public class WolfflueArmorLayer<T extends WolfflueRenderState> extends RenderLayer<T, WolfflueModel<T>> {
     private final WolfflueModel<T> model;
     private static final Map<Crackiness.Level, ResourceLocation> ARMOR_CRACK_LOCATIONS = Map.of(
             Crackiness.Level.LOW,
@@ -43,49 +40,20 @@ public class WolfflueArmorLayer<T extends Wolfflue> extends RenderLayer<T, Wolff
             int p_316312_,
             T p_316642_,
             float p_316350_,
-            float p_316147_,
-            float p_316637_,
-            float p_316734_,
-            float p_316302_,
-            float p_316605_
+            float p_316147_
     ) {
-        if (p_316642_.hasArmor()) {
-            ItemStack itemstack = p_316642_.getBodyArmorItem();
-            if (itemstack.getItem() instanceof AnimalArmorItem animalarmoritem && animalarmoritem.getBodyType() == AnimalArmorItem.BodyType.CANINE) {
-                this.getParentModel().copyPropertiesTo(this.model);
-                this.model.prepareMobModel(p_316642_, p_316350_, p_316147_, p_316637_);
-                this.model.setupAnim(p_316642_, p_316350_, p_316147_, p_316734_, p_316302_, p_316605_);
-                VertexConsumer vertexconsumer = p_316832_.getBuffer(RenderType.entityCutoutNoCull(animalarmoritem.getTexture()));
+        if (p_316642_.bodyArmorItem.getItem() instanceof WolfflueArmorItem wolfflueArmorItem) {
+            ItemStack itemstack = p_316642_.bodyArmorItem;
+
+            this.model.setupAnim(p_316642_);
+            VertexConsumer vertexconsumer = p_316832_.getBuffer(RenderType.entityCutoutNoCull(wolfflueArmorItem.getTexture()));
                 this.model.renderToBuffer(p_316608_, vertexconsumer, p_316312_, OverlayTexture.NO_OVERLAY);
-                this.maybeRenderColoredLayer(p_316608_, p_316832_, p_316312_, itemstack, animalarmoritem);
-                this.maybeRenderCracks(p_316608_, p_316832_, p_316312_, itemstack);
+            this.maybeRenderCracks(p_316608_, p_316832_, p_316312_, itemstack);
                 return;
-            }
+
         }
     }
 
-    private void maybeRenderColoredLayer(PoseStack p_330741_, MultiBufferSource p_330339_, int p_332179_, ItemStack p_331250_, AnimalArmorItem p_330867_) {
-        if (p_331250_.is(ItemTags.DYEABLE)) {
-            int i = DyedItemColor.getOrDefault(p_331250_, 0);
-            if (FastColor.ARGB32.alpha(i) == 0) {
-                return;
-            }
-
-            ResourceLocation resourcelocation = p_330867_.getOverlayTexture();
-            if (resourcelocation == null) {
-                return;
-            }
-
-            this.model
-                    .renderToBuffer(
-                            p_330741_,
-                            p_330339_.getBuffer(RenderType.entityCutoutNoCull(resourcelocation)),
-                            p_332179_,
-                            OverlayTexture.NO_OVERLAY,
-                            FastColor.ARGB32.opaque(i)
-                    );
-        }
-    }
 
     private void maybeRenderCracks(PoseStack p_331222_, MultiBufferSource p_331637_, int p_330931_, ItemStack p_331187_) {
         /*Crackiness.Level crackiness$level = Crackiness.WOLF_ARMOR.byDamage(p_331187_);

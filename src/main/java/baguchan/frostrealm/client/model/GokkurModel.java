@@ -4,13 +4,13 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.10.4
 
 
 import baguchan.frostrealm.client.animation.GokkurAnimations;
-import baguchan.frostrealm.entity.hostile.Gokkur;
-import net.minecraft.client.model.HierarchicalModel;
+import baguchan.frostrealm.client.render.state.GokkurRenderState;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 
-public class GokkurModel<T extends Gokkur> extends HierarchicalModel<T> {
+public class GokkurModel<T extends GokkurRenderState> extends EntityModel<T> {
     public final ModelPart root;
     public final ModelPart body_rotation;
     private final ModelPart left_leg;
@@ -18,6 +18,7 @@ public class GokkurModel<T extends Gokkur> extends HierarchicalModel<T> {
     private final ModelPart body;
 
     public GokkurModel(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.body_rotation = this.root.getChild("body_rotation");
         this.left_leg = this.body_rotation.getChild("left_leg");
@@ -43,18 +44,13 @@ public class GokkurModel<T extends Gokkur> extends HierarchicalModel<T> {
     }
 
     @Override
-    public void setupAnim(Gokkur entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(GokkurRenderState entity) {
         this.root().getAllParts().forEach(ModelPart::resetPose);
         if (entity.rollAnimationState.isStarted() || entity.startRollAnimationState.isStarted()) {
-            this.animate(entity.rollAnimationState, GokkurAnimations.roll, ageInTicks);
-            this.animate(entity.startRollAnimationState, GokkurAnimations.roll_start, ageInTicks);
+            this.animate(entity.rollAnimationState, GokkurAnimations.roll, entity.ageInTicks);
+            this.animate(entity.startRollAnimationState, GokkurAnimations.roll_start, entity.ageInTicks);
         } else {
-            this.animateWalk(GokkurAnimations.walk, limbSwing, limbSwingAmount, 1.0F, 4.0F);
+            this.animateWalk(GokkurAnimations.walk, entity.walkAnimationPos, entity.walkAnimationSpeed, 1.0F, 4.0F);
         }
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.root;
     }
 }

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "item": "frostrealm:frost_boar_fur"
-    }
+    "#": "frostrealm:frost_boar_fur"
   },
   "pattern": [
     "###",

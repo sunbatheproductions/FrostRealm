@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "A": {
-      "item": "frostrealm:frost_crystal"
-    }
+    "A": "frostrealm:frost_crystal"
   },
   "pattern": [
     "AAA",

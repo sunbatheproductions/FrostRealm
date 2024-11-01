@@ -34,12 +34,8 @@ public class CorruptedWalkerPart<T extends CorruptedWalker> extends FrostPart<T>
     }
 
     @Override
-    public boolean hurt(DamageSource damageSource, float damage) {
-        if (!this.isInvulnerableTo(damageSource)) {
-            return this.parentMob.hurt(damageSource, damage * 0.8F);
-        } else {
-            return false;
-        }
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float damage) {
+        return this.parentMob.hurtServer(serverLevel, damageSource, damage * 0.8F);
     }
 
     @Override
