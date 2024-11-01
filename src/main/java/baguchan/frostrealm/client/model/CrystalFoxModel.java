@@ -72,8 +72,9 @@ public class CrystalFoxModel<T extends CrystalFoxRenderState> extends EntityMode
 	@Override
 	public void setupAnim(T entity) {
 		super.setupAnim(entity);
-		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
-		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
+
 		this.leg_right_hind.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed;
 		this.leg_left_hind.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;
 		this.leg_right_front.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;

@@ -3,14 +3,11 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.6.5
 // Paste this class into your mod and generate all required imports
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.world.entity.Entity;
 
 public class AstraBallModel<T extends LivingEntityRenderState> extends EntityModel<T> {
     private final ModelPart root;
@@ -45,7 +42,7 @@ public class AstraBallModel<T extends LivingEntityRenderState> extends EntityMod
 
         this.bone.yRot = f;
         this.bone2.yRot = f;
-        this.root.yRot = entity.xRot * ((float) Math.PI / 180F);
-        this.root.xRot = entity.yRot * ((float) Math.PI / 180F);
+        this.root.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.root.xRot = entity.xRot * ((float) Math.PI / 180F);
     }
 }

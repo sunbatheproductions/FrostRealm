@@ -22,7 +22,7 @@ public class YetiFurArmorModel<T extends HumanoidRenderState> extends HumanoidMo
 				.texOffs(24, 0).addBox(-6.0F, -9.5F, -1.0F, 2.0F, 4.0F, 2.0F, p_170682_)
 				.texOffs(23, 0).addBox(4.0F, -9.5F, -1.0F, 2.0F, 4.0F, 2.0F, p_170682_), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create().texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, p_170682_.extend(0.5F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+		head.addOrReplaceChild("hat", CubeListBuilder.create().texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, p_170682_.extend(0.5F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
 		PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(16, 16).mirror().addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, p_170682_).mirror(false), PartPose.offset(0.0F, 0.0F, 0.0F));
 
@@ -36,6 +36,6 @@ public class YetiFurArmorModel<T extends HumanoidRenderState> extends HumanoidMo
 
 	@Override
     public void setupAnim(T entity) {
-
+		super.setupAnim(entity);
 	}
 }

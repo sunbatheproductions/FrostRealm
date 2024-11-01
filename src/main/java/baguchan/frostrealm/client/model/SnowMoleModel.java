@@ -41,11 +41,11 @@ public class SnowMoleModel<T extends LivingEntityRenderState> extends EntityMode
 
 	@Override
     public void setupAnim(T entity) {
-        super.setupAnim(entity);
-        this.root.xRot = entity.yRot * ((float) Math.PI / 180F);
-        this.root.yRot = entity.xRot * ((float) Math.PI / 180F);
+		super.setupAnim(entity);
+		this.root.yRot = entity.yRot * ((float) Math.PI / 180F);
+		this.root.xRot = entity.xRot * ((float) Math.PI / 180F);
 
-        this.handR.zRot = Mth.cos(entity.walkAnimationPos * 0.6662F * 0.6F) * 1.25F * entity.walkAnimationSpeed;
+		this.handR.zRot = Mth.cos(entity.walkAnimationPos * 0.6662F * 0.6F) * 1.25F * entity.walkAnimationSpeed;
         this.handL.zRot = Mth.cos(entity.walkAnimationPos * 0.6662F * 0.6F + (float) Math.PI) * 1.25F * entity.walkAnimationSpeed;
 	}
 }

@@ -68,9 +68,9 @@ public class SeekerModel<T extends SeekerRenderState> extends EntityModel<T> imp
 
     @Override
     public void setupAnim(T entity) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+        super.setupAnim(entity);
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
         this.right_leg.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 0.7F * entity.walkAnimationSpeed;
         this.left_leg.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 0.7F * entity.walkAnimationSpeed;

@@ -75,8 +75,8 @@ public class VenochemModel<T extends VenochemRenderState> extends EntityModel<T>
     @Override
     public void setupAnim(T entity) {
         super.setupAnim(entity);
-        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
         this.animate(entity.attackAnimationState, VenochemAnimation.attack, entity.ageInTicks);
         this.animate(entity.shootAnimationState, VenochemAnimation.spit, entity.ageInTicks);

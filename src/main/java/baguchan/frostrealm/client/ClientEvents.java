@@ -11,7 +11,6 @@ import baguchan.frostrealm.utils.aurorapower.AuroraPowerUtils;
 import baguchi.bagus_lib.animation.BaguAnimationController;
 import baguchi.bagus_lib.client.event.BagusModelEvent;
 import net.minecraft.Util;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.HumanoidArm;
@@ -58,26 +57,18 @@ public class ClientEvents {
                 bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get().resetPose();
                 bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get().resetPose();
                 bagusModelEvent.applyStatic(SpearAttackAnimations.idle_right);
-                    if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
-                        bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_right, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
-                    } else {
-                        bagusModelEvent.applyStatic(SpearAttackAnimations.idle_right);
-                    }
-                if (bagusModelEvent.getModel() instanceof PlayerModel) {
-                    bagusModelEvent.getModel().getAnyDescendantWithName("right_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get());
-                    bagusModelEvent.getModel().getAnyDescendantWithName("left_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get());
-                    }
+                if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
+                    bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_right, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
                 } else {
+                    bagusModelEvent.applyStatic(SpearAttackAnimations.idle_right);
+                }
+            } else {
                 bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get().resetPose();
                 bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get().resetPose();
-                    if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
-                        bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_left, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
-                    } else {
-                        bagusModelEvent.applyStatic(SpearAttackAnimations.idle_left);
-                    }
-                if (bagusModelEvent.getModel() instanceof PlayerModel) {
-                    bagusModelEvent.getModel().getAnyDescendantWithName("right_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("right_arm").get());
-                    bagusModelEvent.getModel().getAnyDescendantWithName("left_sleeve").get().copyFrom(bagusModelEvent.getModel().getAnyDescendantWithName("left_arm").get());
+                if (animationController.getAnimationState(FrostAnimations.ATTACK).isStarted()) {
+                    bagusModelEvent.animate(animationController.getAnimationState(FrostAnimations.ATTACK), SpearAttackAnimations.spear_attack_left, bagusModelEvent.getEntityRenderState().ageInTicks, 2.0F);
+                } else {
+                    bagusModelEvent.applyStatic(SpearAttackAnimations.idle_left);
                 }
             }
         }

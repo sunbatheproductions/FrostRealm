@@ -79,7 +79,7 @@ public class BearBerryBushBlock extends BushBlock implements BonemealableBlock {
 		int i = p_57275_.getValue(AGE);
 		boolean flag = i == 3;
 		if (!flag && p_57278_.getItemInHand(p_57279_).is(Items.BONE_MEAL)) {
-			return InteractionResult.TRY_WITH_EMPTY_HAND;
+			return InteractionResult.SUCCESS;
 		} else if (i > 2) {
 			int j = 1 + p_57276_.random.nextInt(2);
 			popResource(p_57276_, p_57277_, new ItemStack(FrostItems.BEARBERRY.get(), j));

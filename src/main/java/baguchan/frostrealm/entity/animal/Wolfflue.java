@@ -590,7 +590,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                         this.jumping = false;
                         this.navigation.stop();
                         this.setTarget(null);
-                        return InteractionResult.TRY_WITH_EMPTY_HAND;
+                        return InteractionResult.SUCCESS.withoutItem();
                     } else {
                         return interactionresult;
                     }
@@ -599,7 +599,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
             } else if (this.isFood(itemstack) && !this.isAngry()) {
                 itemstack.consume(1, p_30412_);
                 this.tryToTame(p_30412_);
-                return InteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS_SERVER;
             } else {
                 return super.mobInteract(p_30412_, p_30413_);
             }

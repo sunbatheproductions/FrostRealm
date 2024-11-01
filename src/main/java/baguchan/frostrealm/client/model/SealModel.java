@@ -49,9 +49,10 @@ public class SealModel<T extends SealRenderState> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.xRot = entity.xRot * ((float) Math.PI / 180F) * 0.9F;
-        this.head.yRot = entity.yRot * ((float) Math.PI / 180F) * 0.9F;
+        super.setupAnim(entity);
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
+
         if (entity.isBaby) {
             this.applyStatic(SealAnimations.BABY);
         }

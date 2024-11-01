@@ -52,8 +52,9 @@ public class SnowPileQuailModel<T extends SnowPileQuailRenderState> extends Enti
 	@Override
 	public void setupAnim(T entity) {
 		super.setupAnim(entity);
-		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
-		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
+
 		this.legR.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F) * 1.4F * entity.walkAnimationSpeed;
 		this.legL.xRot = Mth.cos(entity.walkAnimationPos * 0.6662F + (float) Math.PI) * 1.4F * entity.walkAnimationSpeed;
 		this.wingR.zRot = 0.0F;

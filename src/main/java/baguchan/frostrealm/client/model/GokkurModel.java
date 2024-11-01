@@ -44,8 +44,8 @@ public class GokkurModel<T extends GokkurRenderState> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(GokkurRenderState entity) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
+    public void setupAnim(T entity) {
+        super.setupAnim(entity);
         if (entity.rollAnimationState.isStarted() || entity.startRollAnimationState.isStarted()) {
             this.animate(entity.rollAnimationState, GokkurAnimations.roll, entity.ageInTicks);
             this.animate(entity.startRollAnimationState, GokkurAnimations.roll_start, entity.ageInTicks);

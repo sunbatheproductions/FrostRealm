@@ -77,8 +77,8 @@ public class FerretModel<T extends FerretRenderState> extends EntityModel<T> {
     @Override
     public void setupAnim(T entity) {
         super.setupAnim(entity);
-        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
         float f = entity.partialTick;
 

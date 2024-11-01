@@ -68,8 +68,8 @@ public class FrostWraithModel<T extends FrostWraithRenderState> extends EntityMo
 	@Override
 	public void setupAnim(T entity) {
 		super.setupAnim(entity);
-		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
 		this.body.xRot = (float) ((Math.PI / 6F) * entity.walkAnimationSpeed);
 

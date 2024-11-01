@@ -60,9 +60,9 @@ public class FrostBoarModel<T extends FrostBoarRenderState> extends EntityModel<
 
     @Override
     public void setupAnim(T entity) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-        this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+        super.setupAnim(entity);
+        this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+        this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
         this.animateWalk(FrostBoarAnimations.RUN, entity.walkAnimationPos, entity.walkAnimationSpeed * (entity.runningScale), 3.0F, 8.0F);
         this.animateWalk(FrostBoarAnimations.WALK, entity.walkAnimationPos, entity.walkAnimationSpeed * (1.0F - entity.runningScale), 1.0F, 2.0F);

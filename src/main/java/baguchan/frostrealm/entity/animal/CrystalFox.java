@@ -327,7 +327,7 @@ public class CrystalFox extends FrostAnimal implements IShearable {
 
 						}
 						this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0D), this.getRandomY() + 0.5D, this.getRandomZ(1.0D), 0.0D, 0.0D, 0.0D);
-						return InteractionResult.SUCCESS;
+						return InteractionResult.SUCCESS_SERVER;
 					}
 				}
 
@@ -349,7 +349,7 @@ public class CrystalFox extends FrostAnimal implements IShearable {
 				this.level().broadcastEntityEvent(this, (byte) 6);
 			}
 
-			return InteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS_SERVER;
 		}
 		return super.mobInteract(p_30412_, p_30413_);
 	}
