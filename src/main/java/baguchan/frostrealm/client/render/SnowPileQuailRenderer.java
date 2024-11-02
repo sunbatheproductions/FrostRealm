@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -38,6 +39,9 @@ public class SnowPileQuailRenderer<T extends SnowPileQuail> extends MobRenderer<
 		super.extractRenderState(p_362733_, p_360515_, p_361157_);
 		p_360515_.popEggAnimationState.copyFrom(p_362733_.popEggAnimationState);
 		p_360515_.shakeAnimationState.copyFrom(p_362733_.shakeAnimationState);
+		p_360515_.flap = Mth.lerp(p_361157_, p_362733_.oFlap, p_362733_.flap);
+		p_360515_.flapSpeed = Mth.lerp(p_361157_, p_362733_.oFlapSpeed, p_362733_.flapSpeed);
+
 	}
 
 	@Override

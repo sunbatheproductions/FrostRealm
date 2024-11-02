@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -43,10 +44,15 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	private static final EntityDimensions BABY_DIMENSIONS = FrostEntities.SNOWPILE_QUAIL.get().getDimensions().scale(0.5F).withEyeHeight(0.2F);
 	private static final EntityDataAccessor<Boolean> ANGRY = SynchedEntityData.defineId(SnowPileQuail.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Boolean> HAS_EGG = SynchedEntityData.defineId(SnowPileQuail.class, EntityDataSerializers.BOOLEAN);
-
+	public float flap;
+	public float flapSpeed;
+	public float oFlapSpeed;
+	public float oFlap;
+	public float flapping = 1.0F;
+	private float nextFlap = 1.0F;
 	@Nullable
 	private BlockPos homeTarget;
-	private int ticksShake;
+	private int ticksShake = 24000;
 	private int ticksSinceEaten;
 	public final AnimationState shakeAnimationState = new AnimationState();
 	public final AnimationState popEggAnimationState = new AnimationState();
@@ -190,7 +196,16 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 
 	@Override
 	public void aiStep() {
+		this.oFlap = this.flap;
+		this.oFlapSpeed = this.flapSpeed;
+		this.flapSpeed = this.flapSpeed + (this.onGround() ? -1.0F : 4.0F) * 0.3F;
+		this.flapSpeed = Mth.clamp(this.flapSpeed, 0.0F, 1.0F);
+		if (!this.onGround() && this.flapping < 1.0F) {
+			this.flapping = 1.0F;
+		}
 
+		this.flapping *= 0.9F;
+		this.flap = this.flap + this.flapping * 2.0F;
 
 		if (this.isSleeping() || this.isImmobile()) {
 			this.jumping = false;
@@ -209,9 +224,11 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 		if (this.homeTarget != null && !this.level().getBlockState(this.homeTarget).is(FrostBlocks.SNOWPILE_QUAIL_EGG.get())) {
 			this.setHomeTarget(null);
 		}
+
 	}
 
-	protected void pickUpItem(ItemEntity p_28514_) {
+	@Override
+	protected void pickUpItem(ServerLevel serverLevel, ItemEntity p_28514_) {
 		ItemStack itemstack = p_28514_.getItem();
 		if (this.canHoldItem(itemstack)) {
 			int i = itemstack.getCount();

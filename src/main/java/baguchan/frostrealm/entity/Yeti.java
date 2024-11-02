@@ -312,7 +312,6 @@ public class Yeti extends AgeableMob {
 	}
 
 	@Override
-
 	public boolean wantsToPickUp(ServerLevel serverLevel, ItemStack p_34777_) {
 		return EventHooks.canEntityGrief(serverLevel, this) && this.canPickUpLoot() && YetiAi.wantsToPickup(this, p_34777_);
 	}
