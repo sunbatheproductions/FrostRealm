@@ -54,14 +54,14 @@ public class YetiModel<T extends YetiRenderState> extends EntityModel<T> impleme
 
 		PartDefinition left_arm = root.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(44, 90).addBox(0.0F, -0.5F, -4.0F, 8.0F, 26.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(14.0F, -27.0F, -1.0F));
 
-        PartDefinition right_arm = root.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(4, 90).addBox(-8.0F, -0.5F, -5.0F, 8.0F, 26.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(-14.0F, -27.0F, -1.0F));
+		PartDefinition right_arm = root.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(4, 90).addBox(-8.0F, -0.5F, -5.0F, 8.0F, 26.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(-14.0F, -27.0F, -1.0F));
 
-		PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -5.0F, -10.5F, 8.0F, 10.0F, 8.0F, new CubeDeformation(0.0F))
-				.texOffs(24, 0).addBox(-1.0F, 2.0F, -12.5F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F))
-				.texOffs(32, 7).addBox(-1.5F, 0.0F, -5.0F, 3.0F, 3.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -27.0F, -3.0F));
+		PartDefinition head = root.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -5.0F, -7.5F, 8.0F, 10.0F, 8.0F, new CubeDeformation(0.0F))
+				.texOffs(24, 0).addBox(-1.0F, 2.0F, -9.5F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F))
+				.texOffs(32, 7).addBox(-1.5F, 0.0F, -2.0F, 3.0F, 3.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -27.0F, -6.0F));
 
 		PartDefinition horn = head.addOrReplaceChild("horn", CubeListBuilder.create().texOffs(40, 0).addBox(4.0F, -2.0F, -1.0F, 2.0F, 5.0F, 2.0F, new CubeDeformation(0.0F))
-				.texOffs(32, 0).addBox(-6.0F, -2.0F, -1.0F, 2.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -4.0F, -9.0F, 0.7854F, 0.0F, 0.0F));
+				.texOffs(32, 0).addBox(-6.0F, -2.0F, -1.0F, 2.0F, 5.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, -4.0F, -6.0F, 0.7854F, 0.0F, 0.0F));
 
 		return LayerDefinition.create(meshdefinition, 128, 128);
 	}
