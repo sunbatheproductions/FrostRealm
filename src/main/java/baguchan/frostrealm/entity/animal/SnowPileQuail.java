@@ -265,6 +265,10 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	public boolean canHoldItem(ItemStack p_28578_) {
 		Item item = p_28578_.getItem();
 		ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
+		if (p_28578_.is(Items.FEATHER) || p_28578_.is(FrostBlocks.SNOWPILE_QUAIL_EGG.asItem()) || p_28578_.is(FrostItems.COOKED_SNOWPILE_QUAIL_EGG.asItem())) {
+			return false;
+		}
+
 		return itemstack.isEmpty() || this.ticksSinceEaten > 0 && p_28578_.get(DataComponents.FOOD) != null && !p_28578_.is(ItemTags.MEAT) && p_28578_.get(DataComponents.FOOD) == null;
 	}
 
