@@ -3,7 +3,7 @@
     {
       "element": {
         "element_type": "minecraft:legacy_single_pool_element",
-        "location": "frostrealm:igloo/plains/town_centers/rest_place",
+        "location": "frostrealm:igloo/igloo_entrance",
         "processors": {
           "processors": []
         },

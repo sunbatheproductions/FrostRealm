@@ -71,7 +71,7 @@ public class FrostStructures {
         HolderGetter<StructureProcessorList> processors = context.lookup(Registries.PROCESSOR_LIST);
 
         context.register(IGLOO_ENTRANCE, new StructureTemplatePool(emptyPool, ImmutableList.of(
-                Pair.of(StructurePoolElement.legacy(name("igloo/plains/town_centers/rest_place")), 1)
+                Pair.of(StructurePoolElement.legacy(name("igloo/igloo_entrance")), 1)
         ), StructureTemplatePool.Projection.RIGID));
 
         context.register(IGLOO_HOUSE, new StructureTemplatePool(emptyPool, ImmutableList.of(
