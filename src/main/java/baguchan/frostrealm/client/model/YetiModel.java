@@ -68,8 +68,8 @@ public class YetiModel<T extends YetiRenderState> extends EntityModel<T> impleme
 	@Override
 	public void setupAnim(T entity) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.head.yRot = entity.xRot * ((float) Math.PI / 180F);
-		this.head.xRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.yRot = entity.yRot * ((float) Math.PI / 180F);
+		this.head.xRot = entity.xRot * ((float) Math.PI / 180F);
 
 		float f = 1.0F;
 
