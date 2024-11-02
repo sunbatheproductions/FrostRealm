@@ -3,6 +3,7 @@ package baguchan.frostrealm.client.model;// Made with Blockbench 4.1.1
 // Paste this class into your mod and generate all required imports
 
 
+import baguchan.frostrealm.client.animation.SnowPileQuailAnimations;
 import baguchan.frostrealm.client.render.state.SnowPileQuailRenderState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
@@ -60,10 +61,8 @@ public class SnowPileQuailModel<T extends SnowPileQuailRenderState> extends Enti
 		this.wingR.zRot = 0.0F;
 		this.wingL.zRot = -0.0F;
 
-		/*if (!entity.onGround()) {
-			this.wingR.zRot = 0.6F + 0.8F * Mth.sin(2.4F * ageInTicks);
-			this.wingL.zRot = -0.6F + -0.8F * Mth.sin(2.4F * ageInTicks);
-		}*/
+		this.animate(entity.popEggAnimationState, SnowPileQuailAnimations.pop_egg, entity.ageInTicks);
+		this.animate(entity.shakeAnimationState, SnowPileQuailAnimations.shake, entity.ageInTicks);
 	}
 
 	@Override

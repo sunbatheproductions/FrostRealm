@@ -3,6 +3,7 @@ package baguchan.frostrealm.entity.animal;
 import baguchan.frostrealm.block.SnowPileQuailEggBlock;
 import baguchan.frostrealm.entity.IHasEgg;
 import baguchan.frostrealm.entity.goal.BreedAndEggGoal;
+import baguchan.frostrealm.entity.goal.FindAndPlaceEggGoal;
 import baguchan.frostrealm.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -44,9 +46,10 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 
 	@Nullable
 	private BlockPos homeTarget;
-
+	private int ticksShake;
 	private int ticksSinceEaten;
-
+	public final AnimationState shakeAnimationState = new AnimationState();
+	public final AnimationState popEggAnimationState = new AnimationState();
 	public SnowPileQuail(EntityType<? extends Animal> p_27557_, Level p_27558_) {
 		super(p_27557_, p_27558_);
 		this.setCanPickUpLoot(true);
@@ -57,6 +60,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 		return this.isBaby() ? BABY_DIMENSIONS : super.getDefaultDimensions(p_316516_);
 	}
 
+	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
 		this.goalSelector.addGoal(1, new PanicGoal(this, 1.4D));
@@ -67,7 +71,22 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 		this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Ferret.class, 8.0F, 1.55D, 1.45D, (p_28590_) -> {
 			return !((Ferret) p_28590_).isTame();
 		}));
-        this.goalSelector.addGoal(4, new BreedAndEggGoal<>(this, 1.0D));
+		this.goalSelector.addGoal(3, new FindAndPlaceEggGoal<>(this, 0.8D) {
+			@Override
+			public void afterPlaceEgg() {
+				level().playSound(null, blockPos, SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + level().random.nextFloat() * 0.2F);
+				level().setBlock(blockPos, FrostBlocks.SNOWPILE_QUAIL_EGG.get().defaultBlockState().setValue(SnowPileQuailEggBlock.EGGS, Integer.valueOf(random.nextInt(1) + 1)), 3);
+				setHomeTarget(blockPos);
+				//egg animation
+				level().broadcastEntityEvent(this.mob, (byte) 7);
+			}
+
+			@Override
+			protected boolean isValidTarget(LevelReader p_25619_, BlockPos p_25620_) {
+				return SnowPileQuailEggBlock.onDirt(p_25619_, p_25620_);
+			}
+		});
+		this.goalSelector.addGoal(4, new BreedAndEggGoal<>(this, 1.0D));
 		this.goalSelector.addGoal(5, new TemptGoal(this, 1.0D, (item) -> item.is(FrostTags.Items.SNOWPILE_FOODS), false));
 		this.goalSelector.addGoal(6, new FollowParentGoal(this, 1.1D));
 		this.goalSelector.addGoal(7, new MoveToGoal(this, 8.0D, 1.1D));
@@ -76,14 +95,27 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 		this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
 	}
 
+	@Override
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
 		builder.define(ANGRY, false);
 		builder.define(HAS_EGG, false);
 	}
 
+	@Override
+	public void handleEntityEvent(byte p_21807_) {
+		if (p_21807_ == 5) {
+			this.shakeAnimationState.start(this.tickCount);
+		} else if (p_21807_ == 7) {
+			this.popEggAnimationState.start(this.tickCount);
+		} else {
+			super.handleEntityEvent(p_21807_);
+		}
+
+	}
+
 	public static AttributeSupplier.Builder createAttributes() {
-		return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 8.0D).add(Attributes.MOVEMENT_SPEED, 0.25D);
+		return Animal.createAnimalAttributes().add(Attributes.MAX_HEALTH, 8.0D).add(Attributes.MOVEMENT_SPEED, 0.25D);
 	}
 
 	@Override
@@ -126,8 +158,10 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 	}
 
 	@Override
-	public void aiStep() {
-		if (!this.level().isClientSide && this.isAlive() && this.isEffectiveAi()) {
+	protected void customServerAiStep(ServerLevel serverLevel) {
+		super.customServerAiStep(serverLevel);
+
+		if (this.isAlive() && this.isEffectiveAi()) {
 			++this.ticksSinceEaten;
 			ItemStack itemstack = this.getItemBySlot(EquipmentSlot.MAINHAND);
 			if (this.canEat(itemstack)) {
@@ -144,7 +178,19 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 					this.level().broadcastEntityEvent(this, (byte) 45);
 				}
 			}
+
+			if (--this.ticksShake <= 0) {
+				this.level().broadcastEntityEvent(this, (byte) 5);
+				this.playSound(SoundEvents.WOLF_SHAKE);
+				this.spawnAtLocation(serverLevel, new ItemStack(Items.FEATHER, 1 + this.random.nextInt()));
+				this.ticksShake = 12000 + this.random.nextIntBetweenInclusive(6000, 12000);
+			}
 		}
+	}
+
+	@Override
+	public void aiStep() {
+
 
 		if (this.isSleeping() || this.isImmobile()) {
 			this.jumping = false;
@@ -159,16 +205,6 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 			this.setDeltaMovement(vec3.multiply(1.0D, 0.6D, 1.0D));
 		}
 
-		if (this.isAlive() && this.hasEgg() && this.getTarget() == null) {
-			BlockPos blockpos = this.blockPosition();
-			if (SnowPileQuailEggBlock.onDirt(this.level(), blockpos)) {
-				level().playSound(null, blockpos, SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + level().random.nextFloat() * 0.2F);
-				level().setBlock(blockpos, FrostBlocks.SNOWPILE_QUAIL_EGG.get().defaultBlockState().setValue(SnowPileQuailEggBlock.EGGS, Integer.valueOf(this.random.nextInt(1) + 1)), 3);
-				this.setHasEgg(false);
-				this.setHomeTarget(blockpos);
-				this.setAge(2400);
-			}
-		}
 
 		if (this.homeTarget != null && !this.level().getBlockState(this.homeTarget).is(FrostBlocks.SNOWPILE_QUAIL_EGG.get())) {
 			this.setHomeTarget(null);
@@ -231,6 +267,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 			compoundTag.put("HomeTarget", NbtUtils.writeBlockPos(this.homeTarget));
 		}
 		compoundTag.putBoolean("HasEgg", hasEgg());
+		compoundTag.putInt("TickShake", this.ticksShake);
 	}
 
 	@Override
@@ -240,6 +277,7 @@ public class SnowPileQuail extends FrostAnimal implements IHasEgg {
 			this.homeTarget = NbtUtils.readBlockPos(compoundTag, "HomeTarget").orElse(null);
 		}
 		this.setHasEgg(compoundTag.getBoolean("HasEgg"));
+		this.ticksShake = compoundTag.getInt("TickShake");
 	}
 
 	public void setHomeTarget(@Nullable BlockPos pos) {

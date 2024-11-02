@@ -33,7 +33,14 @@ public class SnowPileQuailRenderer<T extends SnowPileQuail> extends MobRenderer<
         super.scale(p_115314_, p_115315_);
     }
 
-    @Override
+	@Override
+	public void extractRenderState(T p_362733_, SnowPileQuailRenderState p_360515_, float p_361157_) {
+		super.extractRenderState(p_362733_, p_360515_, p_361157_);
+		p_360515_.popEggAnimationState.copyFrom(p_362733_.popEggAnimationState);
+		p_360515_.shakeAnimationState.copyFrom(p_362733_.shakeAnimationState);
+	}
+
+	@Override
     public ResourceLocation getTextureLocation(SnowPileQuailRenderState p_110775_1_) {
 		return TEXTURE;
 	}

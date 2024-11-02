@@ -22,7 +22,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -103,7 +102,7 @@ public class CrystalFox extends FrostAnimal implements IShearable {
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
-		return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.FOLLOW_RANGE, 32.0D).add(Attributes.ATTACK_DAMAGE, 2.0D);
+		return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.FOLLOW_RANGE, 32.0D).add(Attributes.ATTACK_DAMAGE, 2.0D).add(Attributes.SAFE_FALL_DISTANCE, 9.0D);
 	}
 
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -408,10 +407,6 @@ public class CrystalFox extends FrostAnimal implements IShearable {
 
 		p_27587_.put("Trusted", listtag);
 		p_27587_.putBoolean("Shearable", this.isShearableWithoutConditions());
-	}
-
-	protected int calculateFallDamage(float p_28545_, float p_28546_) {
-		return Mth.ceil((p_28545_ - 5.0F) * p_28546_);
 	}
 
 	public class FoxEatBerriesGoal extends MoveToBlockGoal {

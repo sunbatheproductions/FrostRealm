@@ -71,7 +71,7 @@ public class SnowMole extends Animal {
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 12.0D).add(Attributes.FOLLOW_RANGE, 20.0D).add(Attributes.STEP_HEIGHT, 1.0F).add(Attributes.MOVEMENT_SPEED, 0.24D);
+		return Animal.createAnimalAttributes().add(Attributes.MAX_HEALTH, 12.0D).add(Attributes.FOLLOW_RANGE, 20.0D).add(Attributes.STEP_HEIGHT, 1.0F).add(Attributes.MOVEMENT_SPEED, 0.24D);
 	}
 
 	public static boolean checkSnowMoleSpawnRules(EntityType<? extends Animal> p_27578_, LevelAccessor p_27579_, EntitySpawnReason p_27580_, BlockPos p_27581_, RandomSource p_27582_) {
