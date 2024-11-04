@@ -52,9 +52,9 @@ public class FrostStructures {
                                 .terrainAdapation(TerrainAdjustment.BEARD_THIN)
                                 .build(),
                         pools.getOrThrow(IGLOO_ENTRANCE),
-                        6,
+                        8,
                         ConstantHeight.of(VerticalAnchor.absolute(0)),
-                        true,
+                        false,
                         Heightmap.Types.WORLD_SURFACE_WG
                 )
         );
@@ -71,22 +71,23 @@ public class FrostStructures {
         HolderGetter<StructureProcessorList> processors = context.lookup(Registries.PROCESSOR_LIST);
 
         context.register(IGLOO_ENTRANCE, new StructureTemplatePool(emptyPool, ImmutableList.of(
-                Pair.of(StructurePoolElement.legacy(name("igloo/igloo_entrance")), 1)
+                Pair.of(StructurePoolElement.single(name("igloo/igloo_entrance")), 1)
         ), StructureTemplatePool.Projection.RIGID));
 
         context.register(IGLOO_HOUSE, new StructureTemplatePool(emptyPool, ImmutableList.of(
-                Pair.of(StructurePoolElement.legacy(name("igloo/igloo_1")), 3),
-                Pair.of(StructurePoolElement.legacy(name("igloo/igloo_2")), 1),
-                Pair.of(StructurePoolElement.legacy(name("igloo/igloo_2")), 4)
+                Pair.of(StructurePoolElement.single(name("igloo/igloo_1")), 2),
+                Pair.of(StructurePoolElement.single(name("igloo/igloo_2")), 1),
+                Pair.of(StructurePoolElement.single(name("igloo/rest_place")), 1),
+                Pair.of(StructurePoolElement.single(name("igloo/igloo_3")), 4)
         ), StructureTemplatePool.Projection.RIGID));
 
 
         context.register(IGLOO_ROAD, new StructureTemplatePool(emptyPool, ImmutableList.of(
-                Pair.of(StructurePoolElement.legacy(name("igloo/road_1"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 5),
-                Pair.of(StructurePoolElement.legacy(name("igloo/road_2"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 2),
-                Pair.of(StructurePoolElement.legacy(name("igloo/road_3"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 2),
-                Pair.of(StructurePoolElement.legacy(name("igloo/road_4"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 4),
-                Pair.of(StructurePoolElement.legacy(name("igloo/road_5"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 1)), StructureTemplatePool.Projection.TERRAIN_MATCHING));
+                Pair.of(StructurePoolElement.single(name("igloo/road_1"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 5),
+                Pair.of(StructurePoolElement.single(name("igloo/road_2"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 2),
+                Pair.of(StructurePoolElement.single(name("igloo/road_3"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 2),
+                Pair.of(StructurePoolElement.single(name("igloo/road_4"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 4),
+                Pair.of(StructurePoolElement.single(name("igloo/road_5"), processors.getOrThrow(IGLOO_ROAD_PROCESSOR)), 1)), StructureTemplatePool.Projection.TERRAIN_MATCHING));
 
 
         context.register(YETI, new StructureTemplatePool(emptyPool, ImmutableList.of(

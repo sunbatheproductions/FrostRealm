@@ -20,6 +20,7 @@ import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -260,6 +262,18 @@ public class Yeti extends AgeableMob {
 		super.completeUsingItem();
 	}
 
+	@Override
+	public InteractionResult mobInteract(Player p_34745_, InteractionHand p_34746_) {
+		InteractionResult interactionresult = super.mobInteract(p_34745_, p_34746_);
+		if (interactionresult.consumesAction()) {
+			return interactionresult;
+		} else if (this.level() instanceof ServerLevel serverlevel) {
+			return YetiAi.mobInteract(serverlevel, this, p_34745_, p_34746_);
+		} else {
+			boolean flag = YetiAi.canAdmire(this, p_34745_.getItemInHand(p_34746_)) && State.get(this.getState()) != State.TRADE;
+			return (InteractionResult) (flag ? InteractionResult.SUCCESS : InteractionResult.PASS);
+		}
+	}
 
 	@Override
 	public void tick() {

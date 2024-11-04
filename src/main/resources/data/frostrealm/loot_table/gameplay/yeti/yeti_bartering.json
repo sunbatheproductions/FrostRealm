@@ -22,7 +22,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "frostrealm:rye_wheat",
+          "name": "frostrealm:rye",
           "functions": [
             {
               "add": false,

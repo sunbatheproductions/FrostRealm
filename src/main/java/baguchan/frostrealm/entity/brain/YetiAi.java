@@ -18,6 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -147,6 +148,37 @@ public class YetiAi<E extends Yeti> {
         }
 
         return p_34611_.getBrain().getMemory(MemoryModuleType.NEAREST_ATTACKABLE);
+    }
+
+    public static InteractionResult mobInteract(ServerLevel p_376885_, Yeti yeti, Player p_34848_, InteractionHand p_34849_) {
+        ItemStack itemstack = p_34848_.getItemInHand(p_34849_);
+        if (canAdmire(yeti, itemstack)) {
+            ItemStack itemstack1 = itemstack.consumeAndReturn(1, p_34848_);
+            holdInOffHand(p_376885_, yeti, itemstack1);
+            admireGoldItem(yeti);
+            stopWalking(yeti);
+            yeti.setState(Yeti.State.IDLING);
+            return InteractionResult.SUCCESS;
+        } else {
+            return InteractionResult.PASS;
+        }
+    }
+
+    public static boolean canAdmire(Yeti p_34910_, ItemStack p_34911_) {
+        return !isAdmiringDisabled(p_34910_) && !isAdmiringItem(p_34910_) && p_34910_.isAdult() && p_34911_.is(FrostTags.Items.YETI_CURRENCY);
+    }
+
+    private static boolean isAdmiringItem(Yeti p_35021_) {
+        return p_35021_.getBrain().hasMemoryValue(MemoryModuleType.ADMIRING_ITEM);
+    }
+
+    private static void admireGoldItem(LivingEntity p_34939_) {
+        p_34939_.getBrain().setMemoryWithExpiry(MemoryModuleType.ADMIRING_ITEM, true, 119L);
+    }
+
+    private static void stopWalking(Yeti p_35007_) {
+        p_35007_.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
+        p_35007_.getNavigation().stop();
     }
 
     private static float getSpeedModifier(LivingEntity livingEntity) {
@@ -356,10 +388,10 @@ public class YetiAi<E extends Yeti> {
             return isNotHoldingLovedItemInOffHand(p_34858_);
         } else {
             boolean flag = p_34858_.canAddToInventory(p_34859_);
-            if (isFood(p_34858_, p_34859_)) {
-                return flag;
-            } else if (!isLovedItem(p_34859_)) {
+            if (!isLovedItem(p_34859_)) {
                 return false;
+            } else if (isFood(p_34858_, p_34859_)) {
+                return flag;
             } else {
                 return isNotHoldingLovedItemInOffHand(p_34858_) && flag;
             }
@@ -381,12 +413,6 @@ public class YetiAi<E extends Yeti> {
 
     private static List<ItemStack> getBarterResponseItems(Yeti p_34997_) {
         LootTable loottable = p_34997_.level().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, FrostLoots.YETI_BARTERING));
-        List<ItemStack> list = loottable.getRandomItems((new LootParams.Builder((ServerLevel) p_34997_.level())).withParameter(LootContextParams.THIS_ENTITY, p_34997_).create(LootContextParamSets.PIGLIN_BARTER));
-        return list;
-    }
-
-    private static List<ItemStack> getBigBarterResponseItems(Yeti p_34997_) {
-        LootTable loottable = p_34997_.level().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, FrostLoots.YETI_BIG_BARTERING));
         List<ItemStack> list = loottable.getRandomItems((new LootParams.Builder((ServerLevel) p_34997_.level())).withParameter(LootContextParams.THIS_ENTITY, p_34997_).create(LootContextParamSets.PIGLIN_BARTER));
         return list;
     }
