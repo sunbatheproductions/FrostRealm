@@ -393,7 +393,7 @@ public class YetiAi<E extends Yeti> {
             } else if (isFood(p_34858_, p_34859_)) {
                 return flag;
             } else {
-                return isNotHoldingLovedItemInOffHand(p_34858_) && flag;
+                return isNotHoldingLovedItemInOffHand(p_34858_);
             }
         }
     }
