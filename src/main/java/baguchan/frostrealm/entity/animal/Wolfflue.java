@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -57,6 +58,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -66,7 +68,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder<Holder<WolfflueVariant>> {
+public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder<Holder<WolfflueVariant>>, Saddleable, PlayerRideableJumping {
     private static final EntityDataAccessor<Boolean> DATA_INTERESTED_ID = SynchedEntityData.defineId(Wolfflue.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_COLLAR_COLOR = SynchedEntityData.defineId(Wolfflue.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(Wolfflue.class, EntityDataSerializers.INT);
@@ -96,6 +98,9 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
     private float runningScale;
     private float runningScaleO;
+
+    protected float playerJumpPendingScale;
+    private boolean isJumping;
 
     public Wolfflue(EntityType<? extends Wolfflue> p_30369_, Level p_30370_) {
         super(p_30369_, p_30370_);
@@ -142,7 +147,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Animal.createAnimalAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 20.0).add(Attributes.SAFE_FALL_DISTANCE, 6.0).add(Attributes.FOLLOW_RANGE, 18.0F).add(Attributes.ATTACK_DAMAGE, 5.0);
+        return Animal.createAnimalAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 20.0).add(Attributes.SAFE_FALL_DISTANCE, 6.0).add(Attributes.FOLLOW_RANGE, 18.0F).add(Attributes.SAFE_FALL_DISTANCE, 6.0F).add(Attributes.ATTACK_DAMAGE, 5.0);
     }
 
     private void setupAnimationStates() {
@@ -524,6 +529,15 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
         this.doHurtEquipment(p_332118_, p_330593_, EquipmentSlot.BODY);
     }
 
+    protected void doPlayerRide(Player p_30634_) {
+        this.setOrderedToSit(false);
+        if (!this.level().isClientSide) {
+            p_30634_.setYRot(this.getYRot());
+            p_30634_.setXRot(this.getXRot());
+            p_30634_.startRiding(this);
+        }
+    }
+
     @Override
     public InteractionResult mobInteract(Player p_30412_, InteractionHand p_30413_) {
         ItemStack itemstack = p_30412_.getItemInHand(p_30413_);
@@ -566,6 +580,13 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                         return InteractionResult.SUCCESS;
                     }
 
+                    if (itemstack.is(Items.SADDLE) && this.isOwnedBy(p_30412_) && this.getBodyArmorItem().isEmpty() && !this.isBaby()) {
+                        this.setBodyArmorItem(itemstack.copyWithCount(1));
+                        this.setGuaranteedDrop(EquipmentSlot.BODY);
+                        itemstack.consume(1, p_30412_);
+                        this.playSound(SoundEvents.STRIDER_SADDLE);
+                        return InteractionResult.SUCCESS;
+                    } else
                     if (itemstack.is(FrostItems.WOLFFLUE_ASTRIUM_ARMOR.get()) && this.isOwnedBy(p_30412_) && this.getBodyArmorItem().isEmpty() && !this.isBaby()) {
                         this.setBodyArmorItem(itemstack.copyWithCount(1));
                         this.setGuaranteedDrop(EquipmentSlot.BODY);
@@ -583,17 +604,20 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
                             this.spawnAtLocation(serverLevel, itemstack1);
                         }
                         return InteractionResult.SUCCESS;
-                    } else {
-                    InteractionResult interactionresult = super.mobInteract(p_30412_, p_30413_);
-                    if (!interactionresult.consumesAction() && this.isOwnedBy(p_30412_)) {
-                        this.setOrderedToSit(!this.isOrderedToSit());
-                        this.jumping = false;
-                        this.navigation.stop();
-                        this.setTarget(null);
+                    } else if (this.isSaddled() && !p_30412_.isShiftKeyDown()) {
+                        this.doPlayerRide(p_30412_);
                         return InteractionResult.SUCCESS.withoutItem();
                     } else {
-                        return interactionresult;
-                    }
+                        InteractionResult interactionresult = super.mobInteract(p_30412_, p_30413_);
+                        if (!interactionresult.consumesAction() && this.isOwnedBy(p_30412_)) {
+                            this.setOrderedToSit(!this.isOrderedToSit());
+                            this.jumping = false;
+                            this.navigation.stop();
+                            this.setTarget(null);
+                            return InteractionResult.SUCCESS.withoutItem();
+                        } else {
+                            return interactionresult;
+                        }
                     }
                 }
             } else if (this.isFood(itemstack) && !this.isAngry()) {
@@ -774,6 +798,170 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     ) {
         return p_218293_.getBlockState(p_218295_.below()).is(FrostTags.Blocks.ANIMAL_SPAWNABLE) && isBrightEnoughToSpawn(p_218293_, p_218295_);
     }
+
+    @Nullable
+    @Override
+    public LivingEntity getControllingPassenger() {
+        if (this.isSaddled()) {
+            Entity entity = this.getFirstPassenger();
+            if (entity instanceof Player) {
+                return (Player) entity;
+            }
+        }
+
+        return super.getControllingPassenger();
+    }
+
+    @Override
+    public boolean isSaddleable() {
+        return !this.isWearingBodyArmor() && this.isTame() && this.isAlive() && !this.isBaby();
+    }
+
+    @Override
+    public void equipSaddle(ItemStack p_352360_, @org.jetbrains.annotations.Nullable SoundSource p_21748_) {
+        this.setBodyArmorItem(p_352360_);
+        if (p_21748_ != null) {
+            this.level().playSound(null, this, SoundEvents.STRIDER_SADDLE, p_21748_, 0.5F, 1.0F);
+        }
+    }
+
+    @Override
+    protected void tickRidden(Player p_278233_, Vec3 p_275693_) {
+        super.tickRidden(p_278233_, p_275693_);
+        Vec2 vec2 = this.getRiddenRotation(p_278233_);
+        this.setRot(vec2.y, vec2.x);
+        this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
+        if (this.isControlledByLocalInstance()) {
+
+            if (this.onGround()) {
+                this.setIsJumping(false);
+                if (this.getPose() == Pose.LONG_JUMPING) {
+                    this.setPose(Pose.STANDING);
+                }
+                if (this.playerJumpPendingScale > 0.0F && !this.isJumping()) {
+                    this.executeRidersJump(this.playerJumpPendingScale, p_275693_);
+                }
+
+                this.playerJumpPendingScale = 0.0F;
+            }
+        }
+    }
+
+    public boolean isJumping() {
+        return this.isJumping;
+    }
+
+    public void setIsJumping(boolean p_30656_) {
+        this.isJumping = p_30656_;
+    }
+
+
+    protected Vec2 getRiddenRotation(LivingEntity p_275502_) {
+        return new Vec2(p_275502_.getXRot() * 0.5F, p_275502_.getYRot());
+    }
+
+    @Override
+    protected Vec3 getRiddenInput(Player p_278278_, Vec3 p_275506_) {
+        float f = p_278278_.xxa * 0.5F;
+        float f1 = p_278278_.zza;
+        if (f1 <= 0.0F) {
+            f1 *= 0.25F;
+        }
+
+        return new Vec3((double) f, 0.0, (double) f1);
+    }
+
+    @Override
+    protected Vec3 getPassengerAttachmentPoint(Entity p_294748_, EntityDimensions p_295089_, float p_295230_) {
+        float f = Math.min(0.25F, this.walkAnimation.speed());
+        float f1 = this.walkAnimation.position();
+        float f2 = 0.12F * Mth.cos(f1 * 1.5F) * 2.0F * f;
+        return super.getPassengerAttachmentPoint(p_294748_, p_295089_, p_295230_).add(
+                new Vec3(0.0, 0.0F, -0.5F)
+                        .yRot(-this.getYRot() * (float) (Math.PI / 180.0))
+        );
+    }
+
+    @Override
+    protected float getRiddenSpeed(Player p_278336_) {
+        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+    }
+
+    @Override
+    public boolean isSaddled() {
+        return this.getBodyArmorItem().is(Items.SADDLE);
+    }
+
+    @Override
+    public void onPlayerJump(int p_21696_) {
+        if (this.isSaddled()) {
+            if (p_21696_ < 0) {
+                p_21696_ = 0;
+            }
+
+            if (p_21696_ >= 90) {
+                this.playerJumpPendingScale = 1.0F;
+            } else {
+                this.playerJumpPendingScale = 0.4F + 0.4F * (float) p_21696_ / 90.0F;
+            }
+        }
+    }
+
+    @Override
+    public boolean canJump() {
+        return this.isSaddled();
+    }
+
+    @Override
+    public void handleStartJump(int p_21695_) {
+        this.makeSound(SoundEvents.GOAT_LONG_JUMP);
+        this.gameEvent(GameEvent.ENTITY_ACTION);
+
+    }
+
+    @Override
+    public void handleStopJump() {
+
+    }
+
+    @Override
+    public boolean canSprint() {
+        return true;
+    }
+
+    @Override
+    public boolean causeFallDamage(float p_149499_, float p_149500_, DamageSource p_149501_) {
+        int i = this.calculateFallDamage(p_149499_, p_149500_);
+        if (i <= 0) {
+            return false;
+        } else {
+            this.hurt(p_149501_, (float) i);
+            if (this.isVehicle()) {
+                for (Entity entity : this.getIndirectPassengers()) {
+                    entity.hurt(p_149501_, (float) i);
+                }
+            }
+
+            this.playBlockFallSound();
+            return true;
+        }
+    }
+
+    protected void executeRidersJump(float p_248808_, Vec3 p_275435_) {
+        double d0 = (double) this.getJumpPower(p_248808_ + 0.5F);
+        Vec3 vec3 = this.getDeltaMovement();
+        this.setDeltaMovement(vec3.x, d0, vec3.z);
+        this.setIsJumping(true);
+        this.setPose(Pose.LONG_JUMPING);
+        this.hasImpulse = true;
+        net.neoforged.neoforge.common.CommonHooks.onLivingJump(this);
+        if (p_275435_.z > 0.0) {
+            float f = Mth.sin(this.getYRot() * (float) (Math.PI / 180.0));
+            float f1 = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
+            this.setDeltaMovement(this.getDeltaMovement().add((double) (-0.4F * f * p_248808_), 0.0, (double) (0.4F * f1 * p_248808_)));
+        }
+    }
+
 
     private class WolffluePackData extends AgeableMob.AgeableMobGroupData {
         public final Holder<WolfflueVariant> type;

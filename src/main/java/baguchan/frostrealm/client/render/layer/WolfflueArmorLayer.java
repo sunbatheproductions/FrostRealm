@@ -1,5 +1,6 @@
 package baguchan.frostrealm.client.render.layer;
 
+import baguchan.frostrealm.FrostRealm;
 import baguchan.frostrealm.client.FrostModelLayers;
 import baguchan.frostrealm.client.model.WolfflueModel;
 import baguchan.frostrealm.client.render.state.WolfflueRenderState;
@@ -15,6 +16,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Crackiness;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SaddleItem;
 
 import java.util.Map;
 
@@ -28,6 +30,9 @@ public class WolfflueArmorLayer<T extends WolfflueRenderState> extends RenderLay
             Crackiness.Level.HIGH,
             ResourceLocation.withDefaultNamespace("textures/entity/wolf/wolf_armor_crackiness_high.png")
     );
+    private static final ResourceLocation SADDLE_LOCATION = ResourceLocation.fromNamespaceAndPath(FrostRealm.MODID, "textures/entity/wolfflue/armor/saddle.png");
+
+
 
     public WolfflueArmorLayer(RenderLayerParent<T, WolfflueModel<T>> p_316639_, EntityModelSet p_316756_) {
         super(p_316639_);
@@ -51,6 +56,12 @@ public class WolfflueArmorLayer<T extends WolfflueRenderState> extends RenderLay
             this.maybeRenderCracks(p_316608_, p_316832_, p_316312_, itemstack);
                 return;
 
+        }
+
+        if (p_316642_.bodyArmorItem.getItem() instanceof SaddleItem) {
+            this.model.setupAnim(p_316642_);
+            VertexConsumer vertexconsumer = p_316832_.getBuffer(RenderType.entityCutoutNoCull(SADDLE_LOCATION));
+            this.model.renderToBuffer(p_316608_, vertexconsumer, p_316312_, OverlayTexture.NO_OVERLAY);
         }
     }
 
