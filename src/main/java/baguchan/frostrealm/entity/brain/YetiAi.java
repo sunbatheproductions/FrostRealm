@@ -157,7 +157,7 @@ public class YetiAi<E extends Yeti> {
             holdInOffHand(p_376885_, yeti, itemstack1);
             admireGoldItem(yeti);
             stopWalking(yeti);
-            yeti.setState(Yeti.State.IDLING);
+            yeti.setState(Yeti.State.TRADE);
             return InteractionResult.SUCCESS;
         } else {
             return InteractionResult.PASS;
