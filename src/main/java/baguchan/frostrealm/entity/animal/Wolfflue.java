@@ -860,6 +860,10 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
         this.isJumping = p_30656_;
     }
 
+    @Override
+    protected float nextStep() {
+        return super.nextStep();
+    }
 
     protected Vec2 getRiddenRotation(LivingEntity p_275502_) {
         return new Vec2(p_275502_.getXRot() * 0.5F, p_275502_.getYRot());
@@ -878,21 +882,26 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity p_294748_, EntityDimensions p_295089_, float p_295230_) {
-        float f2 = this.runningScale * 0.25F;
+        float f = Math.min(0.25F, this.walkAnimation.speed());
+        float f1 = this.walkAnimation.position();
+        float scale = (2.5F * (1.0F + runningScale));
+        float f2 = 0.12F * Mth.cos(f1 * 1.0F) * scale * f;
+        float f3 = this.runningScale * 0.25F;
 
         if (this.getPose() == Pose.LONG_JUMPING) {
+            f3 = 0.0F;
             f2 = 0.0F;
         }
 
         return super.getPassengerAttachmentPoint(p_294748_, p_295089_, p_295230_).add(
-                new Vec3(0.0, 0.0F - f2, -0.25F)
+                new Vec3(0.0, 0.0F - f3 + (double) (f2 * p_295230_ * 0.75F), -0.25F)
                         .yRot(-this.getYRot() * (float) (Math.PI / 180.0))
         );
     }
 
     @Override
     protected float getRiddenSpeed(Player p_278241_) {
-        float f = p_278241_.isSprinting() ? 0.1F : 0.0F;
+        float f = p_278241_.isSprinting() ? 0.05F : 0.0F;
         return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) + f - 0.1F;
     }
 
