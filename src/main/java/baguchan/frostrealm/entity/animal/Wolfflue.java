@@ -147,7 +147,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Animal.createAnimalAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 20.0).add(Attributes.SAFE_FALL_DISTANCE, 6.0).add(Attributes.FOLLOW_RANGE, 18.0F).add(Attributes.SAFE_FALL_DISTANCE, 6.0F).add(Attributes.ATTACK_DAMAGE, 5.0);
+        return Animal.createAnimalAttributes().add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.MAX_HEALTH, 20.0).add(Attributes.SAFE_FALL_DISTANCE, 8.0).add(Attributes.FOLLOW_RANGE, 18.0F).add(Attributes.ATTACK_DAMAGE, 5.0);
     }
 
     private void setupAnimationStates() {
@@ -948,7 +948,7 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
     }
 
     protected void executeRidersJump(float p_248808_, Vec3 p_275435_) {
-        double d0 = (double) this.getJumpPower(p_248808_ + 0.5F);
+        double d0 = (double) this.getJumpPower(p_248808_ * 1.75F);
         Vec3 vec3 = this.getDeltaMovement();
         this.setDeltaMovement(vec3.x, d0, vec3.z);
         this.setIsJumping(true);
