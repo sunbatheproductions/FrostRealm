@@ -40,6 +40,7 @@ public class WolfflueRenderer<T extends Wolfflue> extends MobRenderer<T, Wolfflu
         p_363549_.idleSitAnimationState.copyFrom(p_363274_.idleSitAnimationState);
         p_363549_.idleSit2AnimationState.copyFrom(p_363274_.idleSit2AnimationState);
         p_363549_.jumpAnimationState.copyFrom(p_363274_.jumpAnimationState);
+        p_363549_.running = p_363274_.getRunningScale(p_362105_);
     }
 
     @Override

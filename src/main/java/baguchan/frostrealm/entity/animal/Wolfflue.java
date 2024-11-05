@@ -177,17 +177,6 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
             this.stopIdleAnimation();
         }
 
-        runningScaleO = runningScale;
-        if (this.isMoving()) {
-
-            if (isDashing()) {
-                runningScale = Mth.clamp(runningScale + 0.1F, 0, 1);
-            } else {
-                runningScale = Mth.clamp(runningScale - 0.1F, 0, 1);
-            }
-        } else {
-            //idleAnimationState.startIfStopped(this.tickCount);
-        }
     }
 
 
@@ -343,6 +332,22 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
         if (this.level().isClientSide()) {
             this.setupAnimationStates();
+        }
+        //need client but also need to use apply the riding point
+        this.setupRunning();
+    }
+
+    private void setupRunning() {
+        runningScaleO = runningScale;
+        if (this.isMoving()) {
+
+            if (isDashing()) {
+                runningScale = Mth.clamp(runningScale + 0.1F, 0, 1);
+            } else {
+                runningScale = Mth.clamp(runningScale - 0.1F, 0, 1);
+            }
+        } else {
+            //idleAnimationState.startIfStopped(this.tickCount);
         }
     }
 
@@ -873,18 +878,22 @@ public class Wolfflue extends TamableAnimal implements NeutralMob, VariantHolder
 
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity p_294748_, EntityDimensions p_295089_, float p_295230_) {
-        float f = Math.min(0.25F, this.walkAnimation.speed());
-        float f1 = this.walkAnimation.position();
-        float f2 = 0.12F * Mth.cos(f1 * 1.5F) * 2.0F * f;
+        float f2 = this.runningScale * 0.25F;
+
+        if (this.getPose() == Pose.LONG_JUMPING) {
+            f2 = 0.0F;
+        }
+
         return super.getPassengerAttachmentPoint(p_294748_, p_295089_, p_295230_).add(
-                new Vec3(0.0, 0.0F, -0.5F)
+                new Vec3(0.0, 0.0F - f2, -0.25F)
                         .yRot(-this.getYRot() * (float) (Math.PI / 180.0))
         );
     }
 
     @Override
-    protected float getRiddenSpeed(Player p_278336_) {
-        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+    protected float getRiddenSpeed(Player p_278241_) {
+        float f = p_278241_.isSprinting() ? 0.1F : 0.0F;
+        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) + f - 0.1F;
     }
 
     @Override
